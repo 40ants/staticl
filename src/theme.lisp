@@ -1,0 +1,87 @@
+(uiop:define-package #:staticl/theme
+  (:use #:cl)
+  (:import-from #:serapeum
+                #:->
+                #:fmt)
+  (:import-from #:utilities.print-items
+                #:print-items-mixin)
+  (:import-from #:staticl/utils
+                #:find-class-by-name)
+  (:import-from #:alexandria
+                #:remove-from-plistf)
+  (:import-from #:utilities.print-items
+                #:print-items)
+  (:export #:theme
+           #:template-vars
+           #:render))
+(in-package #:staticl/theme)
+
+
+(defclass theme (print-items-mixin)
+  ((path :initarg :path
+         :type pathname
+         :reader theme-path)))
+
+
+(defmethod print-items append ((theme theme))
+  (list (list :path "~S" (theme-path theme))))
+
+
+(defgeneric template-vars (object &key hash )
+  (:documentation "Fills a hash-table given as HASH argument with variables for filling a template.
+
+                   If hash is NIL, then a new hash-table should be allocated with EQUAL :TEST argument.
+
+                   Returned hash-table will be used for rendering a template for an OBJECT."))
+
+
+(defgeneric render (theme template-name vars stream)
+  (:documentation "Renders fills template named TEMPLATE-NAME with given VARS and renders into a given STREAM.
+
+                   - NAME argument is a string.
+                   - VARS argument is a hash table with string keys."))
+
+
+(-> load-theme-from-dir (pathname string)
+    (values (or null theme) &optional))
+
+(defun load-theme-from-dir (dir theme-name)
+  (let* ((theme-dir
+           (merge-pathnames
+            (make-pathname :directory (list :relative theme-name))
+            (uiop:ensure-directory-pathname dir)))
+         (config-filename
+           (merge-pathnames
+            (make-pathname :name "theme"
+                           :type "lisp")
+            theme-dir)))
+    (when (probe-file config-filename)
+      (let* ((initargs (uiop:read-file-form config-filename))
+             (class-name (getf initargs :class)))
+        (unless class-name
+          (error "Theme metadata should contain a :CLASS attribute."))
+        (remove-from-plistf initargs :class)
+        
+        (let* ((class (find-class-by-name class-name
+                                          :default-package-template "STATICL/THEMES/~A")))
+          (apply #'make-instance class
+                 :path theme-dir
+                 initargs))))))
+
+
+(-> load-theme (string &key (:site-root (or null pathname)))
+    (values theme &optional))
+
+(defun load-theme (name &key site-root)
+  (let ((builtin-themes-dir
+          (asdf:system-relative-pathname "staticl"
+                                         "themes")))
+    (or (when site-root
+          (load-theme-from-dir site-root name))
+        (load-theme-from-dir builtin-themes-dir
+                             name)
+        (error "Theme named ~S not found in ~{~A~#[~; and ~:;, ~]~}"
+               name
+               (remove-if #'null
+                          (list site-root
+                                builtin-themes-dir))))))

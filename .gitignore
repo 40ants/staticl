@@ -1,0 +1,7 @@
+.qlot/
+/docs/build/
+*~
+.#*
+.*.~undo-tree~
+*.fasl
+/example/stage/

@@ -1,0 +1,17 @@
+;;;;;
+title: An index page.
+tags: foo, bar
+created-at: 2024-03-30 08:18:05
+format: md
+;;;;;
+
+<!-- **** your post here (remove this line) **** -->
+<!-- format: could be 'html' (for raw html) or 'md' (for markdown).  -->
+
+Here is my content.
+
+<!--more-->
+
+Excerpt separator can also be extracted from content.
+Add `excerpt: <string>` to the above metadata.
+Excerpt separator is `<!--more-->` by default.

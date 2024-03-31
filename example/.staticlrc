@@ -1,0 +1,3 @@
+;;; -*- mode : lisp -*-
+(:title "Example Staticl Site"
+ :plugins ((sitemap)))

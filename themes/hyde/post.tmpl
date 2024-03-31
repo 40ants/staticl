@@ -1,0 +1,27 @@
+{namespace coleslaw.theme.hyde}
+
+{template post}
+<div class="article-meta">{\n}
+  <h1 class="title">{$content.title}</h1>{\n}
+  <div class="tags">{\n}
+    {if $content.tags}
+      Tagged as {foreach $tag in $content.tags}
+        <a href="{$site.domain}/{$tag.url}">{$tag.name}</a>{nil}
+          {if not isLast($tag)},{sp}{/if}
+      {/foreach}
+    {/if}
+  </div>{\n}
+  <div class="date">{\n}
+    {if $content.created_at}
+      Written on {$content.created_at}
+    {/if}
+  </div>{\n}
+</div>{\n}
+<div class="article-content">{\n}
+  {$content.html |noAutoescape}
+</div>{\n}
+<div class="relative-nav">{\n}
+  {if $prev} <a href="{$site.domain}/{$prev.url}">Previous</a><br> {/if}{\n}
+  {if $next} <a href="{$site.domain}/{$next.url}">Next</a><br> {/if}{\n}
+</div>{\n}
+{/template}
