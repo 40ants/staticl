@@ -13,7 +13,9 @@
                 #:print-items)
   (:export #:theme
            #:template-vars
-           #:render))
+           #:render
+           #:list-static
+           #:copy-static))
 (in-package #:staticl/theme)
 
 
@@ -85,3 +87,25 @@
                (remove-if #'null
                           (list site-root
                                 builtin-themes-dir))))))
+
+
+(defgeneric list-static (theme)
+  (:documentation "Returns a list of static files such as CSS, JS, images.
+
+                   Each list item should be a list of two items where first
+                   item is an absolute pathname and second is a pathname relative
+                   to the root of the site."))
+
+
+(defgeneric copy-static (theme stage-dir)
+  (:documentation "Copies static files such as CSS, JS, images into the STAGE-DIR.
+
+                   Usually it is enough to define a method for LIST-STATIC generic-function.")
+  (:method ((theme theme) (stage-dir pathname))
+    (loop with target-dir = (uiop:ensure-directory-pathname stage-dir)
+          for (source-filename relative-filename) in (list-static theme)
+          for target-filename = (merge-pathnames relative-filename
+                                                 target-dir)
+          do (ensure-directories-exist target-filename)
+             (uiop:copy-file source-filename
+                             target-filename))))

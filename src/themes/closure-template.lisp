@@ -1,29 +1,89 @@
 (uiop:define-package #:staticl/themes/closure-template
   (:use #:cl)
   (:import-from #:closure-template
+                #:define-print-syntax
+                #:register-print-handler
                 #:compile-template)
   (:import-from #:staticl/utils
                 #:transform-keys
                 #:do-files)
-  (:import-from #:staticl/theme)
+  (:import-from #:staticl/theme
+                #:list-static)
   (:import-from #:str
-                #:replace-all))
+                #:replace-all)
+  (:import-from #:local-time
+                #:format-timestring))
 (in-package #:staticl/themes/closure-template)
 
 
 (defclass closure-template (staticl/theme:theme)
   ((namespace :initarg :namespace
               :type string
-              :reader template-namespace))
+              :reader template-namespace)
+   (static-files :reader list-static
+                 :type list)
+   (date-format :initarg :date-format
+                :type list
+                :reader date-format)
+   (datetime-format :initarg :datetime-format
+                    :type list
+                    :reader datetime-format))
   (:default-initargs
-   :namespace (error ":NAMESPACE argument show be given and correspond to the namespace used in *.tmpl files.")))
+   :namespace (error ":NAMESPACE argument show be given and correspond to the namespace used in *.tmpl files.")
+   :date-format local-time:+iso-8601-date-format+
+   :datetime-format (append local-time:+iso-8601-date-format+
+                            '(#\Space (:hour 2) #\: (:min 2)))
+   :static-files nil))
 
+
+(defgeneric register-user-filters (theme)
+  (:documentation "Registers some variable filters useful inside templates.")
+  (:method ((theme closure-template))
+
+    ;; This rule should go first, because it has the same prefix
+    ;; as "date" rule:
+    (define-print-syntax print-datetime "datetime" (:constant t))
+    (define-print-syntax print-date "date" (:constant t))
+    
+    (flet ((format-date (params end value)
+             (declare (ignore params end))
+             (format-timestring nil value
+                                :format (date-format theme)))
+           (format-datetime (params end value)
+             (declare (ignore params end))
+             (format-timestring nil value
+                                :format (datetime-format theme))))
+      (register-print-handler :common-lisp-backend
+                              'print-date
+                              :function #'format-date)
+      (register-print-handler :common-lisp-backend
+                              'print-datetime
+                              :function #'format-datetime))))
 
 (defmethod initialize-instance :after ((obj closure-template) &rest initargs &key path &allow-other-keys)
   (declare (ignore initargs))
+
+  (register-user-filters obj)
   
-  (do-files (filename path :file-type "tmpl")
-    (compile-template :common-lisp-backend filename)))
+  (let ((static-files nil)
+        (root-path (uiop:ensure-directory-pathname path)))
+    
+    (do-files (filename root-path)
+      (let ((ext (pathname-type filename))
+            (exts-to-ignore '("lisp" "fasl")))
+        (cond
+          ((string-equal ext "tmpl")
+           (compile-template :common-lisp-backend filename))
+          ((not (member ext exts-to-ignore :test #'string-equal))
+           (push (list filename
+                       (uiop:enough-pathname filename root-path))
+                 static-files)))))
+
+    ;; Here we'll save collected static files to
+    ;; be able to copy them into the staging dir later.
+    (setf (slot-value obj 'static-files)
+          static-files)
+    (values)))
 
 
 (defun normalize-key (text)
@@ -58,7 +118,7 @@
                                     ;; Closure templates do not have
                                     ;; inheritance, so we just render
                                     ;; inner part of the page separately:
-                                    :raw (with-output-to-string (string-stream)
-                                           (render-helper template template-name vars
-                                                          string-stream)))
+                                    "raw" (with-output-to-string (string-stream)
+                                            (render-helper template template-name vars
+                                                           string-stream)))
                     stream))))

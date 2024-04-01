@@ -20,6 +20,8 @@
   (:import-from #:staticl/content/reader
                 #:read-content-file)
   (:import-from #:local-time
+                #:+iso-8601-date-format+
+                #:format-timestring
                 #:universal-to-timestamp
                 #:timestamp)
   (:import-from #:serapeum
@@ -27,6 +29,13 @@
   (:import-from #:utilities.print-items
                 #:print-items-mixin
                 #:print-items)
+  (:import-from #:closer-mop
+                #:class-slots
+                #:slot-definition-initargs)
+  (:import-from #:staticl/tag
+                #:tag)
+  (:import-from #:staticl/format
+                #:to-html)
   (:export #:supported-content-types
            #:content-type
            #:content
@@ -63,7 +72,10 @@
 
 
 (defclass content (print-items-mixin)
-  ())
+  ((metadata :initform (make-hash-table :test 'equal)
+             :type hash-table
+             :reader content-metadata
+             :documentation "A hash with additional fields specified in the file's header.")))
 
 
 (defclass content-with-title-mixin ()
@@ -78,7 +90,7 @@
 
 (defclass content-with-tags-mixin ()
   ((tags :initarg :tags
-         :type (soft-list-of string)
+         :type (soft-list-of tag)
          :reader content-tags)))
 
 
@@ -106,36 +118,40 @@
 
 
 (defmethod print-items append ((obj content-from-file))
-  (list (list :file (list :after :title) "= ~S" (content-file obj))))
+  `(((:file (:after :title)) " file = ~S" ,(content-file obj))))
 
 
-;; (defmethod print-object ((obj content) stream)
-;;   (print-unreadable-object (obj stream :type t)
-;;     (when (and (slot-boundp obj 'title)
-;;                (slot-boundp obj 'file))
-;;       (format stream "~S :file ~S"
-;;               (content-title obj)
-;;               (content-file obj)))))
+(defmethod initialize-instance ((obj content) &rest initargs &key &allow-other-keys)
+  (let* ((normalized-args
+           (normalize-plist initargs
+                            :created-at (lambda (value)
+                                          (etypecase value
+                                            (null value)
+                                            (string
+                                             (universal-to-timestamp
+                                              (org.shirakumo.fuzzy-dates:parse value)))
+                                            (local-time:timestamp
+                                             value)))
+                            :tags (lambda (value)
+                                    (etypecase value
+                                      (string
+                                       (loop for tag-name in (str:split "," value
+                                                                        :omit-nulls t)
+                                             collect (make-instance 'tag
+                                                                    :name (str:trim tag-name))))))))
+         (result (apply #'call-next-method obj normalized-args))
+         (all-initargs
+           (loop for slot in (class-slots (class-of obj))
+                 appending (slot-definition-initargs slot))))
 
-
-(defmethod initialize-instance ((obj content) &rest initargs)
-  (apply #'call-next-method
-         obj
-         (normalize-plist initargs
-                          :created-at (lambda (value)
-                                        (etypecase value
-                                          (null value)
-                                          (string
-                                           (universal-to-timestamp
-                                            (org.shirakumo.fuzzy-dates:parse value)))
-                                          (local-time:timestamp
-                                           value)))
-                          :tags (lambda (value)
-                                  (etypecase value
-                                    (string
-                                     (mapcar #'str:trim
-                                             (str:split "," value
-                                                        :omit-nulls t))))))))
+    ;; Write unknown initargs into the metadata slot
+    (loop for (key value) on initargs by #'cddr
+          unless (member key all-initargs)
+            do (setf (gethash (string-downcase key)
+                              (content-metadata result))
+                     value))
+    
+    (values result)))
 
 
 (defgeneric supported-content-types (site)
@@ -217,7 +233,7 @@
            (vars (dict "site" site-vars
                        "content" content-vars))
            (template-name (content-template content)))
-      
+
       (staticl/theme:render theme template-name vars stream))))
 
 
@@ -225,12 +241,49 @@
   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
+(defmethod template-vars ((content content) &key (hash (dict)))
+  (setf (gethash "metadata" hash)
+        (content-metadata content))
+  
+  (if (next-method-p)
+      (call-next-method content :hash hash)
+      (values hash)))
+
+
 (defmethod template-vars ((content content-from-file) &key (hash (dict)))
   (setf (gethash "title" hash)
         (content-title content)
         (gethash "html" hash)
-        (staticl/format:to-html (content-text content)
-                                (content-format content)))
+        (to-html (content-text content)
+                 (content-format content))
+        (gethash "created-at" hash)
+        (content-created-at content)
+        
+        ;; (gethash "created-at" hash)
+        ;; (format-timestring nil (content-created-at content)
+        ;;                    :format local-time:+iso-8601-format+)
+        ;; ;; Also we provide only a date, because it might be more convinitent
+        ;; ;; to render it in short format:
+        ;; (gethash "created-at-date" hash)
+        ;; (format-timestring nil (content-created-at content)
+        ;;                    :format +iso-8601-date-format+)
+
+        ;; ;; And in case if user wants a complied to ISO format:
+        ;; (gethash "created-at-iso" hash)
+        ;; (format-timestring nil (content-created-at content)
+        ;;                    :format local-time:+iso-8601-format+)
+        )
+  
+  (if (next-method-p)
+      (call-next-method content :hash hash)
+      (values hash)))
+
+
+(defmethod template-vars ((content content-with-tags-mixin) &key (hash (dict)))
+  (setf (gethash "tags" hash)
+        (mapcar #'template-vars
+                (content-tags content)))
+  
   (if (next-method-p)
       (call-next-method content :hash hash)
       (values hash)))

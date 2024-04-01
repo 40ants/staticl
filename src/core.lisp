@@ -1,6 +1,7 @@
 (uiop:define-package #:staticl
   (:use #:cl)
   (:import-from #:staticl/site
+                #:site-theme
                 #:site-plugins
                 #:make-site)
   (:import-from #:staticl/content
@@ -9,6 +10,8 @@
                 #:preprocess)
   (:import-from #:serapeum
                 #:->)
+  (:import-from #:staticl/theme
+                #:copy-static)
   (:nicknames #:staticl/core)
   (:export #:generate
            #:stage))
@@ -24,7 +27,7 @@
                 (root-dir *default-pathname-defaults*)
                 (stage-dir (merge-pathnames (make-pathname :directory '(:relative "stage"))
                                             (uiop:ensure-directory-pathname root-dir))))
-  (let* ((site  (make-site root-dir))
+  (let* ((site (make-site root-dir))
          (initial-content (read-contents site))
          (plugins (site-plugins site))
          (additional-content
@@ -35,4 +38,7 @@
                               additional-content)))
     (loop for content in all-content
           do (write-content site content stage-dir))
+
+    (copy-static (site-theme site)
+                 stage-dir)
     (values)))

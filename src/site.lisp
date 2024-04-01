@@ -1,6 +1,7 @@
 (uiop:define-package #:staticl/site
   (:use #:cl)
   (:import-from #:log)
+  (:import-from #:local-time)
   (:import-from #:serapeum
                 #:dict
                 #:soft-list-of
@@ -17,13 +18,12 @@
                 #:template-vars
                 #:load-theme
                 #:theme)
-  (:export
-   #:site
-   #:site-content-root
-   #:site-title
-   #:make-site
-   #:site-plugins
-   #:site-theme))
+  (:export #:site
+           #:site-content-root
+           #:site-title
+           #:make-site
+           #:site-plugins
+           #:site-theme))
 (in-package #:staticl/site)
 
 
@@ -105,4 +105,7 @@
 
 (defmethod template-vars ((site site) &key (hash (dict)))
   (setf (gethash "title" hash)
-        (site-title site)))
+        (site-title site)
+        (gethash "pubdate" hash)
+        (local-time:now))
+  (values hash))
