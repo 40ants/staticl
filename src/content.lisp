@@ -36,6 +36,13 @@
                 #:tag)
   (:import-from #:staticl/format
                 #:to-html)
+  (:import-from #:staticl/url
+                #:object-url)
+  (:import-from #:staticl/current-root
+                #:current-root)
+  (:import-from #:staticl/content/html-content
+                #:content-html-excerpt
+                #:content-html)
   (:export #:supported-content-types
            #:content-type
            #:content
@@ -48,7 +55,15 @@
            #:get-target-filename
            #:content-with-title-mixin
            #:content-with-tags-mixin
-           #:content-from-file))
+           #:content-from-file
+           #:load-content
+           #:content-created-at
+           #:content-format
+           #:content-template
+           #:content-file
+           #:content-text
+           #:content-title
+           #:content-excerpt-separator))
 (in-package #:staticl/content)
 
 
@@ -110,11 +125,19 @@
          :type pathname
          :reader content-file
          :documentation "Absolute pathname to the file read from disk or NIL for content objects which have no source file, like RSS feeds.")
+   (url :initarg :url
+        :type (or null string)
+        :documentation "Page's URL or a path relative to Site's URL.")
    (text :initarg :text
          :type string
-         :reader content-text))
+         :reader content-text)
+   (excerpt-separator :initarg :excerpt
+                      :type string
+                      :reader content-excerpt-separator))
   (:default-initargs
-   :template (error "Please, specify :TEMPLATE initarg in subclass of CONTENT-FROM-FILE.")))
+   :template (error "Please, specify :TEMPLATE initarg in subclass of CONTENT-FROM-FILE.")
+   :url nil
+   :excerpt "<!--more-->"))
 
 
 (defmethod print-items append ((obj content-from-file))
@@ -223,6 +246,16 @@
        stage-dir))))
 
 
+(defmethod object-url ((content content-from-file))
+  (or (slot-value content 'url)
+      (let* ((root (current-root))
+             (relative-path (enough-namestring (content-file content)
+                                               root)))
+        (uiop:unix-namestring
+         (merge-pathnames (make-pathname :type "html")
+                          relative-path)))))
+
+
 (defgeneric write-content-to-stream (site content stream)
   (:documentation "Writes CONTENT object to the STREAM using given FORMAT.")
 
@@ -250,12 +283,28 @@
       (values hash)))
 
 
+(defmethod content-html ((content content-from-file))
+  (to-html (content-text content)
+           (content-format content)))
+
+
+
+(defmethod content-html-excerpt ((content content-from-file))
+  (let* ((separator (content-excerpt-separator content))
+         (full-content (content-text content))
+         (excerpt (first
+                   (str:split separator
+                              full-content
+                              :limit 2))))
+    (to-html excerpt
+             (content-format content))))
+
+
 (defmethod template-vars ((content content-from-file) &key (hash (dict)))
   (setf (gethash "title" hash)
         (content-title content)
         (gethash "html" hash)
-        (to-html (content-text content)
-                 (content-format content))
+        (content-html content)
         (gethash "created-at" hash)
         (content-created-at content)
         
@@ -287,3 +336,17 @@
   (if (next-method-p)
       (call-next-method content :hash hash)
       (values hash)))
+
+
+
+(defclass load-content ()
+  ())
+
+
+(defun load-content ()
+  (make-instance 'load-content))
+
+
+(defmethod staticl/pipeline:process-items ((site site) (node load-content) content-items)
+  (loop for new-item in (read-contents site)
+        do (staticl/pipeline:produce-item new-item)))

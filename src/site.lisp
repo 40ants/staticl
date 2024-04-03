@@ -3,6 +3,7 @@
   (:import-from #:log)
   (:import-from #:local-time)
   (:import-from #:serapeum
+                #:directory-pathname
                 #:dict
                 #:soft-list-of
                 #:->)
@@ -18,12 +19,20 @@
                 #:template-vars
                 #:load-theme
                 #:theme)
+  (:import-from #:staticl/url
+                #:assert-absolute-url
+                #:object-url)
+  (:import-from #:staticl/current-root
+                #:with-current-root
+                #:current-root)
   (:export #:site
            #:site-content-root
            #:site-title
            #:make-site
            #:site-plugins
-           #:site-theme))
+           #:site-theme
+           #:site-pipeline
+           #:site-description))
 (in-package #:staticl/site)
 
 
@@ -36,17 +45,37 @@
           :type string
           :reader site-title
           :documentation "Site's title.")
+   (description :initarg :title
+                :type string
+                :reader site-description
+                :documentation "Site's description.")
+   (url :initarg :url
+        :type string
+        :reader object-url
+        :documentation "Site's URL.")
    (theme :initarg :theme
           :type theme
           :reader site-theme
           :documentation "A theme object for the site.")
-   (plugins :initarg :plugins
-            :type (soft-list-of plugin)
-            :reader site-plugins
-            :documentation "A list of site plugins."))
+   (pipeline :initarg :pipeline
+             ;; :type (soft-list-of plugin)
+             :reader site-pipeline
+             :documentation "A list of pipline nodes"))
   (:default-initargs
    :theme "hyde"
-   :root (error "ROOT argument is required.")))
+   :root (error "ROOT argument is required.")
+   :description (error "DECRIPTION argument is required.")
+   :url (error "URL argument is required.")))
+
+
+(defun site (title &rest args)
+  (when (getf args :url)
+    (assert-absolute-url (getf args :url)))
+  
+  (apply #'make-instance 'site
+         :title title
+         :root (probe-file (current-root))
+         args))
 
 
 (defmethod print-object ((obj site) stream)
@@ -68,8 +97,13 @@
                           :plugins (lambda (value)
                                      (etypecase value
                                        (list
-                                        (serapeum:mapply #'make-plugin
-                                                         value)))))))
+                                        (loop for item in value
+                                              collect (typecase item
+                                                        ;; Here we support specifying a plugin
+                                                        ;; as a plist with a :class attribute.
+                                                        (list (apply #'make-plugin
+                                                                     value))
+                                                        (t item)))))))))
 
 
 (-> make-site (pathname)
@@ -82,30 +116,29 @@
     (unless (probe-file rc-file)
       (error "File ~A was not found."
              rc-file))
-    (let* ((args (uiop:read-file-form rc-file))
-           (depends-on (getf args :depends-on))
-           (class-name (getf args :class
-                             "staticl/site:site"))
-           (site-plugins-dir (merge-pathnames (make-pathname :directory '(:relative "plugins"))
-                                              root)))
+    
+    (let ((site-plugins-dir (merge-pathnames (make-pathname :directory '(:relative "plugins"))
+                                             root)))
+      (load-files-from site-plugins-dir))
+    
+    (let ((site (let ((*package* (find-package "STATICL-USER")))
+                  (with-current-root (root)
+                    (uiop:eval-input rc-file)))))
 
-      (when depends-on
-        (mapcar #'load-system depends-on))
 
-      (load-files-from site-plugins-dir)
-
-      ;; We should load class only after all
-      ;; dependencies were loaded
-      (let ((class (find-class-by-name class-name)))
-      
-        (apply #'make-instance class
-               :root root
-               args)))))
+      (unless (typep site 'site)
+        (error "Config ~S does not return a SITE object."
+               rc-file))
+      (values site))))
 
 
 (defmethod template-vars ((site site) &key (hash (dict)))
   (setf (gethash "title" hash)
         (site-title site)
+        (gethash "description" hash)
+        (site-description site)
+        (gethash "url" hash)
+        (object-url site)
         (gethash "pubdate" hash)
         (local-time:now))
   (values hash))

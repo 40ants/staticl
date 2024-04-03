@@ -14,7 +14,8 @@
                "staticl/plugins/sitemap"
                "staticl/themes/closure-template"
                "staticl/format/html"
-               "staticl/format/md")
+               "staticl/format/md"
+               "staticl/user-package")
   :in-order-to ((test-op (test-op "staticl-tests"))))
 
 
@@ -22,3 +23,4 @@
 (asdf:register-system-packages "log4cl" '("LOG"))
 (asdf:register-system-packages "3bmd-ext-code-blocks" '("3BMD-CODE-BLOCKS"))
 (asdf:register-system-packages "fuzzy-dates" '("ORG.SHIRAKUMO.FUZZY-DATES"))
+(asdf:register-system-packages "feeder" '("ORG.SHIRAKUMO.FEEDER"))

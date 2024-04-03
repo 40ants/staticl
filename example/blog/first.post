@@ -10,3 +10,6 @@ I believe, that software should evolve and evolve quickly.
 One of the reasons why Common Lisp seems strange to newcomers is its
 ecosystem. It takes a long time to add a new library and make it useful
 to other common lispers.
+
+This post contains some *Markdown* markup.
+
