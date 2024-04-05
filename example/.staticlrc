@@ -4,9 +4,10 @@
       :url "https://example.com/"
       :pipeline (list (load-content)
                       (filter (:path "ru/")
-                              (rss :target-path #P"ru/blog/rss.xml"))
-                      (filter (:path "ru/" :invert t)
-                              (rss :target-path #P"blog/rss.xml"))
+                              (rss :target-path #P"ru/blog/rss.xml")
+                              (atom :target-path #P"ru/blog/atom.xml"))
+                      ;; (filter (:path "ru/" :invert t)
+                      ;;         (rss :target-path #P"blog/rss.xml"))
                       (sitemap)
                       ;; (rsync "my-site")
                       ))
