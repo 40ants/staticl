@@ -16,42 +16,80 @@
 (in-package #:staticl/index/paginated)
 
 
+(deftype function-from-int-to-string ()
+  '(function (integer) (values string &optional)))
+
+
+(deftype function-from-int-to-pathname ()
+  '(function (integer) (values pathname &optional)))
+
+(declaim (ftype function-from-int-to-string
+                default-page-title-fn))
+
+(defun default-page-title-fn (page-number)
+  (fmt "Page ~A" page-number))
+
+
+(declaim (ftype function-from-int-to-pathname
+                default-page-filename-fn))
+
+(defun default-page-filename-fn (page-number)
+  (let ((name (cond
+                ((= page-number 1)
+                 "index")
+                (t
+                 (fmt "page-~A" page-number)))))
+    (make-pathname :name name
+                   :type "html")))
+
+
 (defclass paginated-index (base-index)
-  ())
+  ((page-filename-fn :initarg :page-filename-fn
+                     :type (or null function-from-int-to-pathname)
+                     :documentation "A callback to change page titles.
+
+                                     Accepts single argument - a page number and should return a pathname relative to the site's root.
+                                     By default, it returns index.html for the first page and page-2.html, page-3.html for others.
+
+                                     If site has \"clean urls\" setting enabled, then additional transformation to the pathname will be
+                                     applied automatically."
+                     :reader page-filename-fn)
+   (page-title-fn :initarg :page-title-fn
+                  :type (or null function-from-int-to-string)
+                  :documentation "A callback to change page titles.
+
+                                  Accepts single argument - a page number and should return a string.
+
+                                  For example, here is how you can translate page title into a russian:
+
+                                  ```lisp
+                                  (paginated-index :target-path #P\"ru/\"
+                                                   :page-title-fn (lambda (num)
+                                                                    (fmt \"Страница ~A\" num)))
+                                  ```
+                                 "
+                  :reader page-title-fn))
+  (:default-initargs
+   :page-title-fn #'default-page-title-fn
+   :page-filename-fn #'default-page-filename-fn))
 
 
-(defun paginated-index (&rest initargs &key target-path page-size template)
-  (declare (ignore target-path page-size template))
+(defun paginated-index (&rest initargs &key target-path page-size template page-title-fn page-filename-fn)
+  (declare (ignore target-path page-size template page-title-fn page-filename-fn))
   (apply #'make-instance 'paginated-index
          initargs))
-
-
-(defgeneric make-page-filename (index page-number)
-  (:documentation "Should return a relative pathname like 2.html or page-2.html.")
-  (:method ((index paginated-index) page-number)
-    (let ((name (cond
-                  ((= page-number 1)
-                   "index")
-                  (t
-                   (fmt "page-~A" page-number)))))
-      (make-pathname :name name
-                     :type "html"))))
-
-
-(defgeneric make-page-title (index page-number)
-  (:documentation "Should return a string with a title for the page")
-  (:method ((index paginated-index) page-number)
-    (fmt "Page ~A" page-number)))
 
 
 (defmethod staticl/pipeline:process-items ((site site) (index paginated-index) content-items)
   (loop for batch in (serapeum:batches content-items (page-size index))
         for page-number upfrom 1
         collect (make-instance 'index-page
-                               :title (make-page-title index page-number)
+                               :title (funcall (page-title-fn index)
+                                               page-number)
                                :target-path (merge-pathnames
                                              ;; TODO: implement clean urls
-                                             (make-page-filename index page-number)
+                                             (funcall (page-filename-fn index)
+                                                      page-number)
                                              (uiop:ensure-directory-pathname
                                               (index-target-path index)))
                                :items batch) into pages

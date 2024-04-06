@@ -5,7 +5,11 @@
   (:import-from #:cl
                 #:list
                 #:t
-                #:nil)
+                #:nil
+                #:lambda
+                #:let)
+  (:import-from #:serapeum
+                #:fmt)
   ;; API imports
   (:import-from #:staticl/plugins/sitemap
                 #:sitemap)

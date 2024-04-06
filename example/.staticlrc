@@ -4,7 +4,9 @@
       :url "https://example.com/"
       :pipeline (list (load-content)
                       (filter (:path "ru/")
-                              (paginated-index :target-path #P"ru/")
+                              (paginated-index :target-path #P"ru/"
+                                               :page-title-fn (lambda (num)
+                                                                (fmt "Страница ~A" num)))
                               (rss :target-path #P"ru/blog/rss.xml")
                               (atom :target-path #P"ru/blog/atom.xml"))
                       ;; (filter (:path "ru/" :invert t)
