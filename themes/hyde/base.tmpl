@@ -20,12 +20,8 @@
   <body>
     <div class="navigation">
       <a href="/">{$site.title}</a> |
-      {foreach $link in $site.sitenav}
-        {if $link.relative}
-          <a href="{$site.domain}/{$link.url}">{$link.name}</a>
-        {else}
-          <a href="{$link.url}">{$link.name}</a>
-        {/if}
+      {foreach $link in $site.navigation.items}
+        <a href="{$link.url}">{$link.title}</a>
         {if not isLast($link)} {sp}|{sp} {/if}
       {/foreach}
     </div>

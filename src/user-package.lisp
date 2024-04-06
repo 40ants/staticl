@@ -12,6 +12,9 @@
   (:import-from #:serapeum
                 #:fmt)
   ;; API imports
+  (:import-from #:staticl/navigation
+                #:menu
+                #:item)
   (:import-from #:staticl/links/prev-next
                 #:prev-next-links)
   (:import-from #:staticl/plugins/sitemap

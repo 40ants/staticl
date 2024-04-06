@@ -26,6 +26,8 @@
   (:import-from #:staticl/current-root
                 #:with-current-root
                 #:current-root)
+  (:import-from #:staticl/navigation
+                #:menu)
   (:export #:site
            #:site-content-root
            #:site-title
@@ -50,6 +52,10 @@
                 :type string
                 :reader site-description
                 :documentation "Site's description.")
+   (navigation :initarg :navigation
+               :type (or null menu)
+               :reader site-navigation
+               :documentation "Site's navigation.")
    (charset :initarg :charset
             :type string
             :reader site-charset
@@ -70,6 +76,7 @@
    :theme "hyde"
    :root (error "ROOT argument is required.")
    :description (error "DECRIPTION argument is required.")
+   :navigation nil
    :url (error "URL argument is required.")
    :charset "UTF-8"))
 
@@ -149,7 +156,9 @@
          "pubdate" 
          (local-time:now)
          "charset"
-         (site-charset site)))
+         (site-charset site)
+         "navigation"
+         (site-navigation site)))
 
 
 (defmethod object-url ((site site) &key &allow-other-keys)

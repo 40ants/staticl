@@ -4,8 +4,9 @@
 Staticl config is constructed from lisp function calls and you can benefit from IDE's code completion.
 
 Variable `config` was renamed to `site`.
-   `post` renamed to `content`
-   `pubdate` renamed to `site.pubdate`.
+    post -> content
+    pubdate -> site.pubdate.
+    site.sitenav -> site.navigation.items also for items inside navigation now have a \"title\" slot instead of \"name\" and also navigation menu can contain submenus, but this requires a special support from the theme. If an item has slot \"item\", then it is a submenu.
 
     index -> content
     index.content -> content.items

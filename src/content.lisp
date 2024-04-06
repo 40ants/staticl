@@ -109,7 +109,9 @@
 (defclass content-with-tags-mixin ()
   ((tags :initarg :tags
          :type (soft-list-of tag)
-         :reader content-tags)))
+         :reader content-tags))
+  (:default-initargs
+   :tags nil))
 
 
 (defclass content-from-file (content-with-title-mixin
@@ -160,6 +162,7 @@
                                              value)))
                             :tags (lambda (value)
                                     (etypecase value
+                                      (list value)
                                       (string
                                        (loop for tag-name in (str:split "," value
                                                                         :omit-nulls t)
