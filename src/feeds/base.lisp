@@ -67,7 +67,6 @@
                                  sorted-items))))
   (values))
 
-
 (defmethod staticl/content:write-content-to-stream ((site site) (feed-file feed-file) stream)
   (loop for item in (content-items feed-file)
         for feed-entry = (make-instance 'org.shirakumo.feeder:entry

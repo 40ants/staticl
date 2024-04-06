@@ -259,7 +259,7 @@
 (defgeneric write-content-to-stream (site content stream)
   (:documentation "Writes CONTENT object to the STREAM using given FORMAT.")
 
-  (:method ((site site) (content content-from-file) (stream stream))
+  (:method ((site site) (content content) (stream stream))
     (let* ((theme (site-theme site))
            (content-vars (template-vars content))
            (site-vars (template-vars site))

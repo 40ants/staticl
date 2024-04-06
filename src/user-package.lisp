@@ -20,4 +20,6 @@
   (:import-from #:staticl/filter
                 #:filter)
   (:import-from #:staticl/rsync
-                #:rsync))
+                #:rsync)
+  (:import-from #:staticl/index/paginated
+                #:paginated-index))
