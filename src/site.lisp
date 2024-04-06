@@ -3,6 +3,7 @@
   (:import-from #:log)
   (:import-from #:local-time)
   (:import-from #:serapeum
+                #:dict*
                 #:directory-pathname
                 #:dict
                 #:soft-list-of
@@ -49,6 +50,10 @@
                 :type string
                 :reader site-description
                 :documentation "Site's description.")
+   (charset :initarg :charset
+            :type string
+            :reader site-charset
+            :documentation "Site's charset. By default it is UTF-8.")
    (url :initarg :url
         :type string
         :reader object-url
@@ -65,7 +70,8 @@
    :theme "hyde"
    :root (error "ROOT argument is required.")
    :description (error "DECRIPTION argument is required.")
-   :url (error "URL argument is required.")))
+   :url (error "URL argument is required.")
+   :charset "UTF-8"))
 
 
 (defun site (title &rest args)
@@ -133,12 +139,14 @@
 
 
 (defmethod template-vars ((site site) &key (hash (dict)))
-  (setf (gethash "title" hash)
-        (site-title site)
-        (gethash "description" hash)
-        (site-description site)
-        (gethash "url" hash)
-        (object-url site)
-        (gethash "pubdate" hash)
-        (local-time:now))
-  (values hash))
+  (dict* hash 
+         "title"
+         (site-title site)
+         "description" 
+         (site-description site)
+         "url" 
+         (object-url site)
+         "pubdate" 
+         (local-time:now)
+         "charset"
+         (site-charset site)))

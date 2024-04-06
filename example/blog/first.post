@@ -1,5 +1,5 @@
 ;;;;;
-title: Second version of Ultralisp.org is available now!
+title: First version of Ultralisp.org is available now!
 description: An announce of the new version on Ultralisp - frequently updated Common Lisp libraries distribution. Ultralisp allows everyone to host list libraries, it is like PyPi hosting from Python world.
 tags: release, my-projects, ultralisp
 created-at: 2019-02-03 15:00
@@ -12,4 +12,5 @@ ecosystem. It takes a long time to add a new library and make it useful
 to other common lispers.
 
 This post contains some *Markdown* markup.
+
 
