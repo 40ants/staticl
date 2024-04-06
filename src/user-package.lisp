@@ -7,7 +7,8 @@
                 #:t
                 #:nil
                 #:lambda
-                #:let)
+                #:let
+                #:in-package)
   (:import-from #:serapeum
                 #:fmt)
   ;; API imports

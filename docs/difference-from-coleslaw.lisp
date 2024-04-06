@@ -1,6 +1,9 @@
 
 (defvar *templates-difference*
-  "Variable `config` was renamed to `site`.
+  "
+Staticl config is constructed from lisp function calls and you can benefit from IDE's code completion.
+
+Variable `config` was renamed to `site`.
    `post` renamed to `content`
    `pubdate` renamed to `site.pubdate`.
 
