@@ -8,6 +8,8 @@
                 #:site)
   (:import-from #:staticl/links/link
                 #:link)
+  (:import-from #:staticl/content/post
+                #:postp)
   (:export #:prev-next-links))
 (in-package #:staticl/links/prev-next)
 
@@ -22,7 +24,8 @@
 
 
 (defmethod staticl/pipeline:process-items ((site site) (node prev-next-links) content-items)
-  (loop for (prev item next) on (list* nil content-items)
+  (loop with only-posts = (remove-if-not #'postp content-items)
+        for (prev item next) on (list* nil only-posts)
         when item
           do (when prev
                (set-metadata item "prev"

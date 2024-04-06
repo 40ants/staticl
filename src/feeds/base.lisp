@@ -11,6 +11,7 @@
                 #:take
                 #:soft-list-of)
   (:import-from #:staticl/content/post
+                #:postp
                 #:post)
   (:import-from #:local-time
                 #:timestamp>))
@@ -51,10 +52,7 @@
 
 
 (defmethod staticl/pipeline:process-items ((site site) (node feed) content-items)
-  (let* ((only-posts
-           (remove-if-not (lambda (item)
-                            (typep item 'post))
-                          content-items))
+  (let* ((only-posts (remove-if-not #'postp content-items))
          (sorted-items (sort only-posts
                              #'timestamp>
                              :key #'content-created-at)))

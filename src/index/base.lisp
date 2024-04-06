@@ -87,15 +87,15 @@
 
 
 (defmethod template-vars ((content index-page) &key (hash (dict)))
-  (flet ((item-vars (content)
+  (flet ((item-vars (item)
            (dict "url"
-                 (staticl/url:object-url content)
+                 (staticl/url:object-url item)
                  "title"
-                 (staticl/content:content-title content)
+                 (staticl/content:content-title item)
                  "created-at"
-                 (staticl/content:content-created-at content)
+                 (staticl/content:content-created-at item)
                  "excerpt"
-                 (staticl/content/html-content:content-html-excerpt content))))
+                 (staticl/content/html-content:content-html-excerpt item))))
     (declare (dynamic-extent #'item-vars))
     
     (setf (gethash "title" hash)

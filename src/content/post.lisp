@@ -3,8 +3,11 @@
   (:import-from #:staticl/content
                 #:content-from-file
                 #:content-type)
+  (:import-from #:serapeum
+                #:->)
   (:export #:post-type
-           #:post))
+           #:post
+           #:postp))
 (in-package #:staticl/content/post)
 
 
@@ -20,3 +23,11 @@
   (:default-initargs
    :type "post"
    :content-class 'post))
+
+
+(-> postp (t)
+    (values boolean &optional))
+
+(defun postp (content-item)
+  "Returns T if given object is a content of type POST."
+  (typep content-item 'post))
