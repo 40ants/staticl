@@ -10,7 +10,9 @@
                 #:base-index)
   (:import-from #:serapeum
                 #:fmt)
-  (:export #:paginated-index))
+  (:export #:paginated-index
+           #:make-page-title
+           #:make-page-filename))
 (in-package #:staticl/index/paginated)
 
 
@@ -36,10 +38,17 @@
                      :type "html"))))
 
 
+(defgeneric make-page-title (index page-number)
+  (:documentation "Should return a string with a title for the page")
+  (:method ((index paginated-index) page-number)
+    (fmt "Page ~A" page-number)))
+
+
 (defmethod staticl/pipeline:process-items ((site site) (index paginated-index) content-items)
   (loop for batch in (serapeum:batches content-items (page-size index))
         for page-number upfrom 1
         collect (make-instance 'index-page
+                               :title (make-page-title index page-number)
                                :target-path (merge-pathnames
                                              ;; TODO: implement clean urls
                                              (make-page-filename index page-number)

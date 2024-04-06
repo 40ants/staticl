@@ -20,7 +20,8 @@
            #:base-index
            #:index-target-path
            #:page-size
-           #:page-target-path))
+           #:page-target-path
+           #:page-title))
 (in-package #:staticl/index/base)
 
 
@@ -54,6 +55,10 @@
                 :type pathname
                 :documentation "Relative pathname to a file with page content."
                 :reader page-target-path)
+   (title :initarg :title
+          :type string
+          :documentation "A title of the page."
+          :reader page-title)
    (items :initarg :items
           :type (soft-list-of content)
           :reader page-items)
@@ -69,6 +74,9 @@
   (:default-initargs
    :prev-page nil
    :next-page nil
+   :items nil
+   :target-path (error "TARGET-PATH is required argument for an index page.")
+   :title (error "TITLE is required argument for an index page.")
    :template *default-template*))
 
 
@@ -91,7 +99,7 @@
     (declare (dynamic-extent #'item-vars))
     
     (setf (gethash "title" hash)
-          "Page N"
+          (page-title content)
           (gethash "items" hash)
           (mapcar #'item-vars (page-items content))
           (gethash "prev" hash)
