@@ -15,21 +15,39 @@
 (defvar *base-url*)
 
 
-(defgeneric object-url (obj)
+(defgeneric object-url (obj &key full)
   (:documentation "Returns a full object URL.
-                   A method can return a relative URL, but in this case a call should happen in a context of WITH-BASE-URL macro.")
-  (:method :around ((obj t))
-    (let ((result (call-next-method)))
+                   A method should return an relative URL, but if case if FULL argument was given,
+                   the full url with schema and domain will be returned.
+
+                   Note a call to this method should happen in a context of the WITH-BASE-URL macro,
+                   because it is always return a path from the site's root even if FULL is not given
+                   (in this case return only the path without a domain).
+
+                   You may wonder: \"Why does we bother to return a path without a domain?\"
+                   It is much easier to service such static site locally for debugging purpose, because
+                   you don't have to setup a web server and dns resolver.
+
+                   Actually you will need to use FULL argument only in a rare case when you really need
+                   and absolute URL, for example in an RSS feed.")
+  (:method :around ((obj t) &key full)
+    (let* ((result (call-next-method))
+           (absolute-url
+             (cond
+               ((absolute-url-p result)
+                (quri:uri result))
+               (t
+                (unless (boundp '*base-url*)
+                  (error "Unable to make an absolute URL from ~A because OBJECT-URL was called outside of WITH-BASE-URL."
+                         result))
+                (quri:merge-uris result
+                                 *base-url*)))))
       (cond
-        ((absolute-url-p result)
-         result)
-        (t
-         (unless (boundp '*base-url*)
-           (error "Unable to make an absolute URL from ~A because OBJECT-URL was called outside of WITH-BASE-URL."
-                  result))
+        (full
          (quri:render-uri
-          (quri:merge-uris result
-                           *base-url*)))))))
+          absolute-url))
+        (t
+         (quri:uri-path absolute-url))))))
 
 
 (-> absolute-url-p (string)

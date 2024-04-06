@@ -19,7 +19,7 @@
   </head>
   <body>
     <div class="navigation">
-      <a href="{$site.domain}">{$site.title}</a> |
+      <a href="/">{$site.title}</a> |
       {foreach $link in $site.sitenav}
         {if $link.relative}
           <a href="{$site.domain}/{$link.url}">{$link.name}</a>
@@ -44,12 +44,12 @@
         {$site.license}
       {else}
         <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US">
-          <img alt="Creative Commons License" style="border-width:0" src="{$site.domain}/css/cc-by-sa.png" />
+          <img alt="Creative Commons License" style="border-width:0" src="/css/cc-by-sa.png" />
         </a>
       {/if}
       by {$site.author}
       <a id="coleslaw-logo" href="https://github.com/redline6561/coleslaw">
-        <img src="{$site.domain}/css/logo_small.jpg" alt="Coleslaw logo" />
+        <img src="/css/logo_small.jpg" alt="Coleslaw logo" />
       </a>
     </div>
   </body>

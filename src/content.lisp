@@ -3,6 +3,7 @@
   (:import-from #:staticl/theme
                 #:template-vars)
   (:import-from #:serapeum
+                #:->
                 #:dict)
   (:import-from #:org.shirakumo.fuzzy-dates)
   (:import-from #:staticl/theme
@@ -30,6 +31,7 @@
                 #:print-items-mixin
                 #:print-items)
   (:import-from #:closer-mop
+                #:slot-definition-name
                 #:class-slots
                 #:slot-definition-initargs)
   (:import-from #:staticl/tag
@@ -63,7 +65,8 @@
            #:content-file
            #:content-text
            #:content-title
-           #:content-excerpt-separator))
+           #:content-excerpt-separator
+           #:set-metadata))
 (in-package #:staticl/content)
 
 
@@ -246,7 +249,7 @@
        stage-dir))))
 
 
-(defmethod object-url ((content content-from-file))
+(defmethod object-url ((content content-from-file) &key &allow-other-keys)
   (or (slot-value content 'url)
       (let* ((root (current-root))
              (relative-path (enough-namestring (content-file content)
@@ -274,13 +277,26 @@
   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
-(defmethod template-vars ((content content) &key (hash (dict)))
-  (setf (gethash "metadata" hash)
-        (content-metadata content))
-  
-  (if (next-method-p)
-      (call-next-method content :hash hash)
-      (values hash)))
+(defmethod template-vars :around ((content content) &key (hash (dict)))
+  (loop with result = (if (next-method-p)
+                          (call-next-method content :hash hash)
+                          (values hash))
+        for key being the hash-key of (content-metadata content)
+          using (hash-value value)
+        do (setf (gethash key result)
+                 (typecase value
+                   ;; For local-time timestamp we want to leave as is
+                   ;; because it's formatting may depend on a template.
+                   (local-time:timestamp
+                    value)
+                   ;; Here we need transform CLOS objects to hash-tables
+                   ;; to make their fields accessable in the template
+                   (standard-object
+                    (template-vars value))
+                   ;; Other types are passed as is:
+                   (t
+                    value)))
+        finally (return result)))
 
 
 (defmethod content-html ((content content-from-file))
@@ -350,3 +366,32 @@
 (defmethod staticl/pipeline:process-items ((site site) (node load-content) content-items)
   (loop for new-item in (read-contents site)
         do (staticl/pipeline:produce-item new-item)))
+
+
+(-> set-metadata (content string t &key (:override-slot boolean))
+    (values t &optional))
+
+(defun set-metadata (content key value &key override-slot)
+  "Changes metadata dictionary by adding a new item with key KEY.
+
+   Key should be a string and it is automatically downcased.
+
+   Note, this way, you can override content's object slots.
+   To prevent accidential override, function will raise an error
+   in case if a slot named KEY exists in the object CONTENT.
+   To force override provide OVERRIDE-SLOT argument."
+  
+  (unless override-slot
+    (when (member key
+                  (loop for slot in (class-slots (class-of content))
+                        collect (slot-definition-name slot))
+                  :test #'string-equal)
+      (cerror "Ignore and override"
+              "Key ~S already exists as a slot of ~S class.
+To override this slot provide :OVERRIDE-SLOT T argument to SET-METADATA function."
+              key
+              (class-name (class-of content)))))
+  
+  (setf (gethash (string-downcase key)
+                 (content-metadata content))
+        value))

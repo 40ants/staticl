@@ -56,7 +56,7 @@
             :documentation "Site's charset. By default it is UTF-8.")
    (url :initarg :url
         :type string
-        :reader object-url
+        :reader site-url
         :documentation "Site's URL.")
    (theme :initarg :theme
           :type theme
@@ -145,8 +145,12 @@
          "description" 
          (site-description site)
          "url" 
-         (object-url site)
+         (site-url site)
          "pubdate" 
          (local-time:now)
          "charset"
          (site-charset site)))
+
+
+(defmethod object-url ((site site) &key &allow-other-keys)
+  (site-url site))

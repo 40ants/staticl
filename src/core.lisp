@@ -4,6 +4,7 @@
                 #:site-content-root
                 #:site-theme
                 #:site-plugins
+                #:site-url
                 #:make-site)
   (:import-from #:staticl/content
                 #:write-content
@@ -48,7 +49,7 @@
          )
     
     (with-current-root ((site-content-root site))
-      (with-base-url ((object-url site))
+      (with-base-url ((site-url site))
         (loop for content in all-content
               do (write-content site content stage-dir))))
 

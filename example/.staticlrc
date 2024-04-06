@@ -6,6 +6,7 @@
       :url "https://example.com/"
       :pipeline (list (load-content)
                       (filter (:path "ru/")
+                              (prev-next-links)
                               (paginated-index :target-path #P"blog"
                                                :page-title-fn (lambda (num)
                                                                 (fmt "Страница ~A" num)))

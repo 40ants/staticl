@@ -23,4 +23,10 @@ For templates base on Closure Template, StatiCL defines these filters:
 To define additional filters, inherit your template class from CLOSURE-TEMPLATE and define a method for REGISTER-USER-FILTERS generic-function.
 
 Instead of makin 1.html and symlinking to it from index.html, StatiCL just generates first page as index.html and other pages as 2.html, 3.html, etc.
+
+
+URLs
+
+Templates in Coleslaw used {$site.domain}/ as a prefix to each URL. With StatiCL all URLs are formatted in advance before
+variables are passed to the template and you don't have to concatenate string to get a proper URL in a template.
 ")
