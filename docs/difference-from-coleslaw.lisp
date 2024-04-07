@@ -30,4 +30,9 @@ URLs
 
 Templates in Coleslaw used {$site.domain}/ as a prefix to each URL. With StatiCL all URLs are formatted in advance before
 variables are passed to the template and you don't have to concatenate string to get a proper URL in a template.
+
+Additional formats
+
+* (ql:quickload :staticl/format/spinneret)
+
 ")

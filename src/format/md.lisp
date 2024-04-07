@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/format/md
   (:use #:cl)
+  (:import-from #:staticl/format)
   (:import-from #:3bmd-code-blocks)
   (:import-from #:3bmd))
 (in-package #:staticl/format/md)
