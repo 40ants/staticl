@@ -14,7 +14,11 @@
                 #:postp
                 #:post)
   (:import-from #:local-time
-                #:timestamp>))
+                #:timestamp>)
+  (:import-from #:staticl/url
+                #:object-url)
+  (:import-from #:staticl/current-root
+                #:current-root))
 (in-package #:staticl/feeds/base)
 
 
@@ -47,7 +51,8 @@
 
 
 (defmethod staticl/content:get-target-filename ((site site) (feed-file feed-file) (stage-dir pathname))
-  (merge-pathnames (target-path feed-file)
+  (merge-pathnames (target-path
+                    feed-file)
                    stage-dir))
 
 
@@ -64,6 +69,7 @@
                     :items (take (feed-length-limit node)
                                  sorted-items))))
   (values))
+
 
 (defmethod staticl/content:write-content-to-stream ((site site) (feed-file feed-file) stream)
   (loop for item in (content-items feed-file)
@@ -84,3 +90,10 @@
                   (plump-node (org.shirakumo.feeder:serialize-feed feed
                                                                    (feed-type feed-file))))
              (plump:serialize plump-node stream))))
+
+
+(defmethod object-url ((feed-file feed-file) &key &allow-other-keys)
+  (let* ((root (current-root))
+         (relative-path (enough-namestring (target-path feed-file)
+                                           root)))
+    (uiop:unix-namestring relative-path)))

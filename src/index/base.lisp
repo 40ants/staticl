@@ -12,6 +12,10 @@
                 #:site)
   (:import-from #:staticl/theme
                 #:template-vars)
+  (:import-from #:staticl/url
+                #:object-url)
+  (:import-from #:staticl/current-root
+                #:current-root)
   (:export #:index-page
            #:page-items
            #:prev-page
@@ -116,3 +120,10 @@
   (if (next-method-p)
       (call-next-method content :hash hash)
       (values hash)))
+
+
+(defmethod object-url ((index index-page) &key &allow-other-keys)
+  (let* ((root (current-root))
+         (relative-path (enough-namestring (page-target-path index)
+                                           root)))
+    (uiop:unix-namestring relative-path)))

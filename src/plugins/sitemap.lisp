@@ -10,7 +10,12 @@
   (:import-from #:staticl/site
                 #:site)
   (:import-from #:serapeum
-                #:soft-list-of))
+                #:soft-list-of)
+  (:import-from #:cl-sitemaps/builder
+                #:make-url
+                #:render-sitemap)
+  (:import-from #:staticl/url
+                #:object-url))
 (in-package #:staticl/plugins/sitemap)
 
 
@@ -42,7 +47,11 @@
 
 
 (defmethod write-content-to-stream ((site site) (sitemap sitemap-file) (stream stream))
-  (write-string "TODO: make-sure to implement sitemaps" stream))
+  (render-sitemap (loop for item in (sitemap-content sitemap)
+                        collect (make-url (object-url item :full t)
+                                          :changefreq :weekly
+                                          :priority 0.5))
+                  :stream stream))
 
 
 (defmethod staticl/pipeline:process-items ((site site) (node sitemap) content-items)
