@@ -1,17 +1,13 @@
 ;;;;;
 title: An index page.
-tags: foo, bar
 created-at: 2024-03-30 08:18:05
 format: md
 ;;;;;
 
-<!-- **** your post here (remove this line) **** -->
-<!-- format: could be 'html' (for raw html) or 'md' (for markdown).  -->
+This is a front page of example site. The site uses StatiCL generator written in Common Lisp.
 
-Here is my content.
+Here you can see how to separate content written in two languages. For example, posts in
+Englush are available at [/blog/](/blog/) URL whereas posts in Russian can be found at
+[/ru/blog/](/ru/blog/). Each blog has it's own rss feeds, but all pages are gathered into a
+single [sitemap.xml](/sitemap.xml) file.
 
-<!--more-->
-
-Excerpt separator can also be extracted from content.
-Add `excerpt: <string>` to the above metadata.
-Excerpt separator is `<!--more-->` by default.

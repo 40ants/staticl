@@ -21,7 +21,7 @@
                 #:sitemap)
   (:import-from #:staticl/site
                 #:site)
-  (:import-from #:staticl/content
+  (:import-from #:staticl/content-pipeline
                 #:load-content)
   (:import-from #:staticl/feeds/rss
                 #:rss)

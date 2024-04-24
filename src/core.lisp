@@ -36,21 +36,11 @@
                 (root-dir *default-pathname-defaults*)
                 (stage-dir (merge-pathnames (make-pathname :directory '(:relative "stage"))
                                             (uiop:ensure-directory-pathname root-dir))))
-  (let* ((site (make-site root-dir))
-         ;; (initial-content (read-contents site))
-         ;; (plugins (site-plugins site))
-         ;; (additional-content
-         ;;   (loop for plugin in plugins
-         ;;         append (preprocess site plugin
-         ;;                            initial-content)))
-         ;; (all-content (append initial-content
-         ;;                      additional-content))
-         (all-content (execute-pipeline site))
-         )
-    
+  (let ((site (make-site root-dir)))
     (with-current-root ((site-content-root site))
       (with-base-url ((site-url site))
-        (loop for content in all-content
+        (loop with all-content = (execute-pipeline site)
+              for content in all-content
               do (write-content site content stage-dir))))
 
     (copy-static (site-theme site)

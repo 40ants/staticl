@@ -8,6 +8,8 @@
                 #:site)
   (:import-from #:staticl/content
                 #:content)
+  (:import-from #:staticl/current-root
+                #:current-root)
   (:export #:filter))
 (in-package #:staticl/filter)
 
@@ -39,7 +41,8 @@
     (let (rules)
 
       (when path
-        (push `(path-matches-p item (uiop:ensure-directory-pathname ,path))
+        (push `(path-matches-p item (merge-pathnames (uiop:ensure-directory-pathname ,path)
+                                                     (current-root)))
               rules))
 
       (setf rules
@@ -74,5 +77,6 @@
 
 (defun path-matches-p (content path)
   (when (typep content 'staticl/content:content-from-file)
-    (uiop:subpathp (staticl/content:content-file content)
-                   path)))
+    (when (uiop:subpathp (staticl/content:content-file content)
+                         path)
+      (values t))))

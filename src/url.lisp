@@ -2,6 +2,7 @@
   (:use #:cl)
   (:import-from #:serapeum
                 #:->)
+  (:import-from #:quri)
   (:import-from #:alexandria
                 #:with-gensyms
                 #:make-gensym)

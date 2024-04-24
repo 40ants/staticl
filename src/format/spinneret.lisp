@@ -3,7 +3,8 @@
   (:import-from #:staticl/format)
   (:import-from #:spinneret)
   (:import-from #:alexandria
-                #:with-gensyms))
+                #:with-gensyms)
+  (:documentation "Optional format. Should be loaded separately."))
 (in-package #:staticl/format/spinneret)
 
 

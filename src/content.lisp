@@ -58,7 +58,6 @@
            #:content-with-title-mixin
            #:content-with-tags-mixin
            #:content-from-file
-           #:load-content
            #:content-created-at
            #:content-format
            #:content-template
@@ -66,7 +65,8 @@
            #:content-text
            #:content-title
            #:content-excerpt-separator
-           #:set-metadata))
+           #:set-metadata
+           #:load-content))
 (in-package #:staticl/content)
 
 
@@ -355,20 +355,6 @@
   (if (next-method-p)
       (call-next-method content :hash hash)
       (values hash)))
-
-
-
-(defclass load-content ()
-  ())
-
-
-(defun load-content ()
-  (make-instance 'load-content))
-
-
-(defmethod staticl/pipeline:process-items ((site site) (node load-content) content-items)
-  (loop for new-item in (read-contents site)
-        do (staticl/pipeline:produce-item new-item)))
 
 
 (-> set-metadata (content string t &key (:override-slot boolean))
