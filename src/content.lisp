@@ -4,6 +4,7 @@
                 #:->
                 #:dict)
   (:import-from #:org.shirakumo.fuzzy-dates)
+  (:import-from #:str)
   (:import-from #:staticl/theme
                 #:template-vars)
   (:import-from #:staticl/site
@@ -208,25 +209,50 @@
                       (values all-content-types))))))
 
 
-(defgeneric read-content-from-disk (site content-type)
-  (:documentation "Returns a list of CONTENT objects corresponding to a given content type")
+(-> make-exclusion-checker ((soft-list-of string))
+    (values
+     (-> (string)
+         (values boolean &optional))
+     &optional))
 
-  (:method ((site site) (content-type content-type))
+(defun make-exclusion-checker (exclude)
+  (flet ((should-be-excluded-p (filename)
+           (loop for prefix in exclude
+                 thereis (str:starts-with-p prefix filename))))
+    (cond
+      (exclude #'should-be-excluded-p)
+      (t (constantly nil)))))
+
+
+(defgeneric read-content-from-disk (site content-type &key exclude)
+  (:documentation "Returns a list of CONTENT objects corresponding to a given content type.
+
+                   EXCLUDE argument is a list of pathname prefixes to ignore. Pathnames should be given relative to the root dir of the site.")
+
+  (:method ((site site) (content-type content-type) &key exclude)
     (uiop:while-collecting (collect)
-      (do-files (file (site-content-root site)
-                 :file-type (content-file-type content-type))
-        (let* ((args (read-content-file file))
-               (obj (apply #'make-instance (content-class content-type)
-                           args)))
-          (collect obj))))))
+      (let ((content-root (site-content-root site))
+            (should-be-excluded-p (make-exclusion-checker exclude)))
+        (do-files (file content-root
+                   :file-type (content-file-type content-type))
+          (let ((relative-pathname (enough-namestring file content-root)))
+            (unless (funcall should-be-excluded-p
+                             relative-pathname)
+              (let* ((args (read-content-file file))
+                     (obj (apply #'make-instance (content-class content-type)
+                                 args)))
+                (collect obj)))))))))
 
 
-(defgeneric read-contents (site)
-  (:documentation "Returns a list of CONTENT objects loaded from files.")
+(defgeneric read-contents (site &key exclude)
+  (:documentation "Returns a list of CONTENT objects loaded from files.
+
+                   EXCLUDE argument is a list of pathname prefixes to ignore. Pathnames should be given relative to the root dir of the site.")
   
-  (:method ((site site))
+  (:method ((site site) &key exclude)
     (loop for content-type in (supported-content-types site)
-          append (read-content-from-disk site content-type))))
+          append (read-content-from-disk site content-type
+                                         :exclude exclude))))
 
 
 (defgeneric write-content (site content stage-dir)
