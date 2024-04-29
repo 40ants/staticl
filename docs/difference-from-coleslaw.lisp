@@ -11,7 +11,7 @@ The `site.sitenav` list was renamed to `site.navigation.items`. Also items insid
 
 ## Index pages
 
-For index pages a list of items was also moved and now instead of `index.content` a `content.items` should be used.
+For index pages a list of items was also moved and now instead of `index.content` a `content.items` should be used. Usually index pages render only the beginning of the post and by default this introduction is separated by `<!--more-->` line. Staticl makes it possible to render a link \"Read more\" by providing an `obj.has_more` flag, which will be set to `T` if the separator is present in the post's body.
 
 ### Index objects
 

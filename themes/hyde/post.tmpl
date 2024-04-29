@@ -5,8 +5,8 @@
   <h1 class="title">{$content.title}</h1>{\n}
   <div class="tags">{\n}
     {if $content.tags}
-      Tagged as {foreach $tag in $content.tags}
-        <a href="{$tag.url}">{$tag.name}</a>{nil}
+        Tagged as {foreach $tag in $content.tags}
+        {if $tag.url}<a href="{$tag.url}">{$tag.name}</a>{else}<b>{$tag.name}</b>{/if}{nil}
           {if not isLast($tag)},{sp}{/if}
       {/foreach}
     {/if}

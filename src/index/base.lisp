@@ -99,7 +99,9 @@
                  "created-at"
                  (staticl/content:content-created-at item)
                  "excerpt"
-                 (staticl/content/html-content:content-html-excerpt item))))
+                 (staticl/content/html-content:content-html-excerpt item)
+                 "has-more"
+                 (staticl/content/html-content:has-more-content-p item))))
     (declare (dynamic-extent #'item-vars))
     
     (setf (gethash "title" hash)

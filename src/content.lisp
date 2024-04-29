@@ -43,6 +43,7 @@
   (:import-from #:staticl/current-root
                 #:current-root)
   (:import-from #:staticl/content/html-content
+                #:has-more-content-p
                 #:content-html-excerpt
                 #:content-html)
   (:import-from #:staticl/clean-urls
@@ -349,6 +350,11 @@
                               :limit 2))))
     (to-html excerpt
              (content-format content))))
+
+(defmethod has-more-content-p ((content content-from-file))
+  (let* ((separator (content-excerpt-separator content))
+         (full-content (content-text content)))
+    (str:containsp separator full-content)))
 
 
 (defmethod template-vars ((site site) (content content-from-file) &key (hash (dict)))
