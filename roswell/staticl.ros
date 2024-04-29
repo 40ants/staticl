@@ -1,0 +1,15 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn
+  (ros:ensure-asdf)
+  #+quicklisp
+  (ql:quickload '("staticl"
+                  "staticl/main")
+                :silent t))
+
+(in-package #:staticl/main)
+
+;;; vim: set ft=lisp lisp:
