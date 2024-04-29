@@ -1,14 +1,17 @@
 (uiop:define-package #:staticl-user
   ;; This package does not use all symbols from CL package intentionally:
-  (:use)
+  (:use #:cl)
+  
   (:nicknames #:staticl/user-package)
-  (:import-from #:cl
-                #:list
-                #:t
-                #:nil
-                #:lambda
-                #:let
-                #:in-package)
+  ;; (:import-from #:cl
+  ;;               #:list
+  ;;               #:t
+  ;;               #:nil
+  ;;               #:lambda
+  ;;               #:let
+  ;;               #:in-package
+  ;;               #:defpackage)
+  
   (:import-from #:serapeum
                 #:fmt)
   ;; API imports
@@ -25,8 +28,8 @@
                 #:load-content)
   (:import-from #:staticl/feeds/rss
                 #:rss)
-  (:import-from #:staticl/feeds/atom
-                #:atom)
+  (:shadowing-import-from #:staticl/feeds/atom
+                          #:atom)
   (:import-from #:staticl/filter
                 #:filter)
   (:import-from #:staticl/rsync

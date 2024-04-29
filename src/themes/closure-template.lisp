@@ -47,12 +47,14 @@
     
     (flet ((format-date (params end value)
              (declare (ignore params end))
-             (format-timestring nil value
-                                :format (date-format theme)))
+             (when value
+               (format-timestring nil value
+                                  :format (date-format theme))))
            (format-datetime (params end value)
              (declare (ignore params end))
-             (format-timestring nil value
-                                :format (datetime-format theme))))
+             (when value
+               (format-timestring nil value
+                                  :format (datetime-format theme)))))
       (register-print-handler :common-lisp-backend
                               'print-date
                               :function #'format-date)

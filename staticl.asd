@@ -15,7 +15,8 @@
                "staticl/themes/closure-template"
                "staticl/format/html"
                "staticl/format/md"
-               "staticl/user-package")
+               "staticl/user-package"
+               "staticl/site-url")
   :in-order-to ((test-op (test-op "staticl-tests"))))
 
 

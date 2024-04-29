@@ -19,7 +19,6 @@
   (:import-from #:staticl/current-root
                 #:with-current-root)
   (:import-from #:staticl/url
-                #:object-url
                 #:with-base-url)
   (:nicknames #:staticl/core)
   (:export #:generate

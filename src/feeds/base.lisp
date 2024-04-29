@@ -74,16 +74,16 @@
 (defmethod staticl/content:write-content-to-stream ((site site) (feed-file feed-file) stream)
   (loop for item in (content-items feed-file)
         for feed-entry = (make-instance 'org.shirakumo.feeder:entry
-                                        :id (staticl/url:object-url item :full t)
-                                        :link (staticl/url:object-url item :full t)
+                                        :id (staticl/url:object-url site item :full t)
+                                        :link (staticl/url:object-url site item :full t)
                                         :title (staticl/content:content-title item)
                                         :summary (staticl/content/html-content:content-html-excerpt item)
                                         :content (staticl/content::content-html item))
         collect feed-entry into entries
         finally
            (let* ((feed (make-instance 'org.shirakumo.feeder:feed
-                                       :id (staticl/url:object-url site :full t)
-                                       :link (staticl/url:object-url site :full t)
+                                       :id (staticl/url:object-url site site :full t)
+                                       :link (staticl/url:object-url site site :full t)
                                        :title (staticl/site:site-title site)
                                        :summary (staticl/site:site-description site)
                                        :content entries))
@@ -92,7 +92,7 @@
              (plump:serialize plump-node stream))))
 
 
-(defmethod object-url ((feed-file feed-file) &key &allow-other-keys)
+(defmethod object-url ((site site) (feed-file feed-file) &key &allow-other-keys)
   (let* ((root (current-root))
          (relative-path (enough-namestring (target-path feed-file)
                                            root)))

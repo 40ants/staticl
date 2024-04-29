@@ -1,6 +1,7 @@
 (uiop:define-package #:staticl/utils
   (:use #:cl)
   (:import-from #:log)
+  (:import-from #:quri)
   (:import-from #:str
                 #:trim-left)
   (:import-from #:serapeum
@@ -14,7 +15,9 @@
                 #:walk-directory)
   (:export
    #:do-files
-   #:normalize-plist))
+   #:normalize-plist
+   #:absolute-url-p
+   #:assert-absolute-url))
 (in-package #:staticl/utils)
 
 
@@ -153,3 +156,27 @@ BODY on files that match the given extension."
     (declare (dynamic-extent #'rec
                              #'to-upper))
     (rec dict)))
+
+
+(-> absolute-url-p (string)
+    (values boolean &optional))
+
+(defun absolute-url-p (url)
+  (let ((parsed (quri:uri url)))
+    (when (and (quri:uri-scheme parsed)
+               (quri:uri-host parsed))
+      (values t))))
+
+
+(-> assert-absolute-url (string)
+    (values string &optional))
+
+(defun assert-absolute-url (url)
+  (let ((parsed (quri:uri url)))
+    (unless (quri:uri-scheme parsed)
+      (error "There is no scheme in ~S."
+             url))
+    (unless (quri:uri-host parsed)
+      (error "There is no host in ~S."
+             url))
+    url))

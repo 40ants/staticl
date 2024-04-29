@@ -84,7 +84,10 @@
 
 (defmethod staticl/pipeline:process-items ((site site) (index paginated-index) content-items)
   (loop with only-posts = (remove-if-not #'postp content-items)
-        for batch in (serapeum:batches only-posts (page-size index))
+        with sorted-posts = (sort only-posts
+                                  #'local-time:timestamp>
+                                  :key #'staticl/content:content-created-at )
+        for batch in (serapeum:batches sorted-posts (page-size index))
         for page-number upfrom 1
         collect (make-instance 'index-page
                                :title (funcall (page-title-fn index)

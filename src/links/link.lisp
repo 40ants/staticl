@@ -9,6 +9,8 @@
                 #:->)
   (:import-from #:staticl/url
                 #:object-url)
+  (:import-from #:staticl/site
+                #:site)
   (:export
    #:link))
 (in-package #:staticl/links/link)
@@ -32,9 +34,9 @@
                  :content content))
 
 
-(defmethod staticl/theme:template-vars ((link link) &key (hash (dict)))
+(defmethod staticl/theme:template-vars ((site site) (link link) &key (hash (dict)))
   (dict* hash
          "url"
-         (object-url (link-content link))
+         (object-url site (link-content link))
          "title"
          (content-title (link-content link))))

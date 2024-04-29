@@ -9,7 +9,7 @@
       :url "https://example.com/"
       :navigation (menu (item "Blog (EN)" "/blog/")
                         (item "Blog (RU)" "/ru/blog/")
-                        (item "About" "/about.html"))
+                        (item "About" "/about/"))
       :pipeline (list (load-content)
                       (filter (:path "ru/")
                               (prev-next-links)

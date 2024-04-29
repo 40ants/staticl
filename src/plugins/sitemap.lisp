@@ -48,7 +48,7 @@
 
 (defmethod write-content-to-stream ((site site) (sitemap sitemap-file) (stream stream))
   (render-sitemap (loop for item in (sitemap-content sitemap)
-                        collect (make-url (object-url item :full t)
+                        collect (make-url (object-url site item :full t)
                                           :changefreq :weekly
                                           :priority 0.5))
                   :stream stream))

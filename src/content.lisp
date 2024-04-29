@@ -1,7 +1,5 @@
 (uiop:define-package #:staticl/content
   (:use #:cl)
-  (:import-from #:staticl/theme
-                #:template-vars)
   (:import-from #:serapeum
                 #:->
                 #:dict)
@@ -13,6 +11,7 @@
                 #:site-content-root
                 #:site)
   (:import-from #:alexandria
+                #:curry
                 #:with-output-to-file
                 #:length=)
   (:import-from #:staticl/utils
@@ -45,6 +44,8 @@
   (:import-from #:staticl/content/html-content
                 #:content-html-excerpt
                 #:content-html)
+  (:import-from #:staticl/clean-urls
+                #:transform-filename)
   (:export #:supported-content-types
            #:content-type
            #:content
@@ -249,10 +250,14 @@
       (merge-pathnames
        (merge-pathnames (make-pathname :type "html")
                         relative-path)
-       stage-dir))))
+       stage-dir)))
+  
+  (:method :around ((site site) (content content) (stage-dir pathname))
+    (transform-filename site
+                        (call-next-method))))
 
 
-(defmethod object-url ((content content-from-file) &key &allow-other-keys)
+(defmethod object-url ((site site) (content content-from-file) &key &allow-other-keys)
   (or (slot-value content 'url)
       (let* ((root (current-root))
              (relative-path (enough-namestring (content-file content)
@@ -267,8 +272,8 @@
 
   (:method ((site site) (content content) (stream stream))
     (let* ((theme (site-theme site))
-           (content-vars (template-vars content))
-           (site-vars (template-vars site))
+           (content-vars (template-vars site content))
+           (site-vars (template-vars site site))
            (vars (dict "site" site-vars
                        "content" content-vars))
            (template-name (content-template content)))
@@ -280,9 +285,9 @@
   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
-(defmethod template-vars :around ((content content) &key (hash (dict)))
+(defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
   (loop with result = (if (next-method-p)
-                          (call-next-method content :hash hash)
+                          (call-next-method site content :hash hash)
                           (values hash))
         for key being the hash-key of (content-metadata content)
           using (hash-value value)
@@ -295,7 +300,7 @@
                    ;; Here we need transform CLOS objects to hash-tables
                    ;; to make their fields accessable in the template
                    (standard-object
-                    (template-vars value))
+                    (template-vars site value))
                    ;; Other types are passed as is:
                    (t
                     value)))
@@ -319,7 +324,7 @@
              (content-format content))))
 
 
-(defmethod template-vars ((content content-from-file) &key (hash (dict)))
+(defmethod template-vars ((site site) (content content-from-file) &key (hash (dict)))
   (setf (gethash "title" hash)
         (content-title content)
         (gethash "html" hash)
@@ -343,13 +348,13 @@
         )
   
   (if (next-method-p)
-      (call-next-method content :hash hash)
+      (call-next-method site content :hash hash)
       (values hash)))
 
 
-(defmethod template-vars ((content content-with-tags-mixin) &key (hash (dict)))
+(defmethod template-vars ((site site) (content content-with-tags-mixin) &key (hash (dict)))
   (setf (gethash "tags" hash)
-        (mapcar #'template-vars
+        (mapcar (curry #'template-vars site)
                 (content-tags content)))
   
   (if (next-method-p)

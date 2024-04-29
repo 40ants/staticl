@@ -90,10 +90,10 @@
 
 
 
-(defmethod template-vars ((content index-page) &key (hash (dict)))
+(defmethod template-vars ((site site) (content index-page) &key (hash (dict)))
   (flet ((item-vars (item)
            (dict "url"
-                 (staticl/url:object-url item)
+                 (staticl/url:object-url site item)
                  "title"
                  (staticl/content:content-title item)
                  "created-at"
@@ -110,19 +110,19 @@
           (when (prev-page content)
             (dict
              "url"
-             (staticl/url:object-url (prev-page content))))
+             (staticl/url:object-url site (prev-page content))))
           (gethash "next" hash)
           (when (next-page content)
             (dict
              "url"
-             (staticl/url:object-url (next-page content))))))
+             (staticl/url:object-url site (next-page content))))))
   
   (if (next-method-p)
       (call-next-method content :hash hash)
       (values hash)))
 
 
-(defmethod object-url ((index index-page) &key &allow-other-keys)
+(defmethod object-url ((site site) (index index-page) &key &allow-other-keys)
   (let* ((root (current-root))
          (relative-path (enough-namestring (page-target-path index)
                                            root)))

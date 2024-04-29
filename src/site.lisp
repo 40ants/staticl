@@ -20,9 +20,8 @@
                 #:template-vars
                 #:load-theme
                 #:theme)
-  (:import-from #:staticl/url
-                #:assert-absolute-url
-                #:object-url)
+  (:import-from #:staticl/utils
+                #:assert-absolute-url)
   (:import-from #:staticl/current-root
                 #:with-current-root
                 #:current-root)
@@ -35,7 +34,8 @@
            #:site-plugins
            #:site-theme
            #:site-pipeline
-           #:site-description))
+           #:site-description
+           #:clean-urls-p))
 (in-package #:staticl/site)
 
 
@@ -64,6 +64,10 @@
         :type string
         :reader site-url
         :documentation "Site's URL.")
+   (clean-urls :initarg :clean-urls
+               :type boolean
+               :reader clean-urls-p
+               :documentation "Generate some-page/index.html instead of some-page.html to make URLs look like https://my-site.com/some-page/ instead of https://my-site.com/some-page.html")
    (theme :initarg :theme
           :type theme
           :reader site-theme
@@ -78,6 +82,7 @@
    :description (error "DECRIPTION argument is required.")
    :navigation nil
    :url (error "URL argument is required.")
+   :clean-urls t
    :charset "UTF-8"))
 
 
@@ -145,21 +150,19 @@
       (values site))))
 
 
-(defmethod template-vars ((site site) &key (hash (dict)))
+(defmethod template-vars ((site site)
+                          (obj site) &key (hash (dict)))
   (dict* hash 
          "title"
-         (site-title site)
+         (site-title obj)
          "description" 
-         (site-description site)
+         (site-description obj)
          "url" 
-         (site-url site)
+         (site-url obj)
          "pubdate" 
          (local-time:now)
          "charset"
-         (site-charset site)
+         (site-charset obj)
          "navigation"
-         (site-navigation site)))
+         (site-navigation obj)))
 
-
-(defmethod object-url ((site site) &key &allow-other-keys)
-  (site-url site))

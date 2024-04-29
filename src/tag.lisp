@@ -4,6 +4,8 @@
                 #:dict)
   (:import-from #:staticl/theme
                 #:template-vars)
+  (:import-from #:staticl/site
+                #:site)
   (:export #:tag-name
            #:tag))
 (in-package #:staticl/tag)
@@ -17,7 +19,7 @@
    :name (error ":NAME is required argument for a tag.")))
 
 
-(defmethod template-vars ((tag tag) &key (hash (dict)))
+(defmethod template-vars ((site site) (tag tag) &key (hash (dict)))
   (setf (gethash "name" hash)
         (tag-name tag))
   (values hash))

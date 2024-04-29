@@ -29,7 +29,7 @@
   (list (list :path "~S" (theme-path theme))))
 
 
-(defgeneric template-vars (object &key hash )
+(defgeneric template-vars (site object &key hash )
   (:documentation "Fills a hash-table given as HASH argument with variables for filling a template.
 
                    If hash is NIL, then a new hash-table should be allocated with EQUAL :TEST argument.
@@ -77,15 +77,20 @@
 (defun load-theme (name &key site-root)
   (let ((builtin-themes-dir
           (asdf:system-relative-pathname "staticl"
-                                         "themes")))
-    (or (when site-root
-          (load-theme-from-dir site-root name))
+                                         "themes"))
+        (site-themes-dir
+          (when site-root
+            (merge-pathnames
+             (make-pathname :directory '(:relative "themes"))
+             (uiop:ensure-directory-pathname site-root)))))
+    (or (when site-themes-dir
+          (load-theme-from-dir site-themes-dir name))
         (load-theme-from-dir builtin-themes-dir
                              name)
         (error "Theme named ~S not found in ~{~A~#[~; and ~:;, ~]~}"
                name
                (remove-if #'null
-                          (list site-root
+                          (list site-themes-dir
                                 builtin-themes-dir))))))
 
 

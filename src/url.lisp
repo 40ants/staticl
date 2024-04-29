@@ -6,17 +6,23 @@
   (:import-from #:alexandria
                 #:with-gensyms
                 #:make-gensym)
+  (:import-from #:staticl/site
+                #:site)
+  (:import-from #:staticl/utils
+                #:assert-absolute-url
+                #:absolute-url-p)
+  (:import-from #:staticl/clean-urls
+                #:transform-url)
   (:export
    #:with-base-url
-   #:object-url
-   #:absolute-url-p))
+   #:object-url))
 (in-package #:staticl/url)
 
 
 (defvar *base-url*)
 
 
-(defgeneric object-url (obj &key full)
+(defgeneric object-url (site obj &key full)
   (:documentation "Returns a full object URL.
                    A method should return an relative URL, but if case if FULL argument was given,
                    the full url with schema and domain will be returned.
@@ -31,7 +37,7 @@
 
                    Actually you will need to use FULL argument only in a rare case when you really need
                    and absolute URL, for example in an RSS feed.")
-  (:method :around ((obj t) &key full)
+  (:method :around ((site site) (obj t) &key full)
     (let* ((result (call-next-method))
            (absolute-url
              (cond
@@ -43,36 +49,13 @@
                          result))
                 (quri:merge-uris result
                                  *base-url*)))))
-      (cond
-        (full
-         (quri:render-uri
-          absolute-url))
-        (t
-         (quri:uri-path absolute-url))))))
-
-
-(-> absolute-url-p (string)
-    (values boolean &optional))
-
-(defun absolute-url-p (url)
-  (let ((parsed (quri:uri url)))
-    (when (and (quri:uri-scheme parsed)
-               (quri:uri-host parsed))
-      (values t))))
-
-
-(-> assert-absolute-url (string)
-    (values string &optional))
-
-(defun assert-absolute-url (url)
-  (let ((parsed (quri:uri url)))
-    (unless (quri:uri-scheme parsed)
-      (error "There is no scheme in ~S."
-             url))
-    (unless (quri:uri-host parsed)
-      (error "There is no host in ~S."
-             url))
-    url))
+      (transform-url site
+                     (cond
+                       (full
+                        (quri:render-uri
+                         absolute-url))
+                       (t
+                        (quri:uri-path absolute-url)))))))
 
 
 (defun call-with-base-url (url thunk)
