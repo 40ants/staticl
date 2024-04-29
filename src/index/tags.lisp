@@ -1,6 +1,7 @@
 (uiop:define-package #:staticl/index/tags
   (:use #:cl)
   (:import-from #:staticl/index/base
+                #:page-target-path
                 #:page-size
                 #:index-target-path
                 #:index-page
@@ -100,6 +101,13 @@
   (:documentation "A tag bound to the index page. A URL for such tags will lead to the index page."))
 
 
+(defmethod print-object ((tag bound-tag) stream)
+  (print-unreadable-object (tag stream :type t)
+    (format stream "\"~A\" ~S"
+            (tag-name tag)
+            (tag-index-page tag))))
+
+
 (-> upgrade-tag (string index-page content-with-tags-mixin)
     (values &optional))
 
@@ -116,6 +124,26 @@
   (let ((hash (call-next-method site tag :hash hash)))
     (setf (gethash "url" hash)
           (object-url site (tag-index-page tag)))
+    (values hash)))
+
+
+(defclass tags-index-page (index-page)
+  ((all-tags :initarg :all-tags
+             :initform nil
+             :accessor all-tags)))
+
+
+(defmethod print-object ((page tags-index-page) stream)
+  (print-unreadable-object (page stream :type t)
+    (format stream "\"~A\""
+            (page-target-path page))))
+
+
+(defmethod template-vars ((site site) (page tags-index-page) &key (hash (dict)))
+  (let ((hash (call-next-method site page :hash hash)))
+    (setf (gethash "tags" hash)
+          (mapcar (curry #'template-vars site)
+                  (all-tags page)))
     (values hash)))
 
 
@@ -137,7 +165,7 @@
                       using (hash-value tagged-posts)
                       for sorted-posts = (sort tagged-posts #'string<
                                                :key #'content-title)
-                      for index-page = (make-instance 'index-page
+                      for index-page = (make-instance 'tags-index-page
                                                       :title (funcall (page-title-fn index)
                                                                       tag-name)
                                                       :target-path (merge-pathnames
@@ -153,5 +181,12 @@
                          (mapc (curry #'upgrade-tag
                                       tag-name
                                       index-page)
-                               sorted-posts)))
+                               sorted-posts)
+                      collect (make-instance 'bound-tag
+                                             :name tag-name
+                                             :index-page index-page) into all-tags
+                      finally (loop for tag in all-tags
+                                    for index-page = (tag-index-page tag)
+                                    do (setf (all-tags index-page)
+                                             all-tags))))
   (values))
