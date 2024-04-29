@@ -17,6 +17,10 @@ For index pages a list of items was also moved and now instead of `index.content
 
 For objects in `content.items` attribute `obj.text` was renamed to `obj.excerpt`. It is a HTML, so `noAutoescape` filter should be applied (as you did in Coleslaw themes too).
 
+### Index by tag
+
+Coleslaw always rendered pages where posts are grouped by tags. But with Staticl you have to include TAGS-INDEX function call into the site's pipeline. Without this step, tag objects will not have a \"url\" slot and template might be ready to render tags without the URL.
+
 ## Other field renames
 
 - `pubdate -> site.pubdate`

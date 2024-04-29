@@ -12,9 +12,7 @@
                 #:fmt)
   (:import-from #:staticl/content/post
                 #:postp)
-  (:export #:paginated-index
-           #:make-page-title
-           #:make-page-filename))
+  (:export #:paginated-index))
 (in-package #:staticl/index/paginated)
 
 

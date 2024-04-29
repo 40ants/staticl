@@ -68,7 +68,8 @@
            #:content-title
            #:content-excerpt-separator
            #:set-metadata
-           #:load-content))
+           #:load-content
+           #:content-tags))
 (in-package #:staticl/content)
 
 

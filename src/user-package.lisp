@@ -1,16 +1,7 @@
 (uiop:define-package #:staticl-user
   ;; This package does not use all symbols from CL package intentionally:
   (:use #:cl)
-  
   (:nicknames #:staticl/user-package)
-  ;; (:import-from #:cl
-  ;;               #:list
-  ;;               #:t
-  ;;               #:nil
-  ;;               #:lambda
-  ;;               #:let
-  ;;               #:in-package
-  ;;               #:defpackage)
   
   (:import-from #:serapeum
                 #:fmt)
@@ -35,4 +26,6 @@
   (:import-from #:staticl/rsync
                 #:rsync)
   (:import-from #:staticl/index/paginated
-                #:paginated-index))
+                #:paginated-index)
+  (:import-from #:staticl/index/tags
+                #:tags-index))
