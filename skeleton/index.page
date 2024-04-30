@@ -1,0 +1,12 @@
+;;;;;
+title: An index page.
+created-at: 2024-03-30
+format: md
+;;;;;
+
+This is a front page of example site. The site uses StatiCL generator written in Common Lisp.
+
+Blog posts are available at [/blog/](/blog/). There is also an [/about/](/about/) page.
+
+The blog has an rss feed, and all pages are gathered into a
+single [sitemap.xml](/sitemap.xml) file.

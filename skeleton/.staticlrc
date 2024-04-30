@@ -1,0 +1,20 @@
+;;; -*- mode : lisp -*-
+(in-package #:staticl-user)
+
+;; This way you can load all required plugins,
+;; which are not included into the Staticl system:
+(asdf:load-system "staticl/format/spinneret")
+
+(site "{{title}}"
+      :description "{{description}}"
+      :url "{{url}}"
+      :navigation (menu (item "Blog" "/blog/")
+                        (item "About" "/about/"))
+      :pipeline (list (load-content)
+                      (prev-next-links)
+                      (paginated-index :target-path "blog/")
+                      (rss :target-path "blog/rss.xml")
+                      (atom :target-path "blog/atom.xml")
+                      (tags-index :target-path "tags/")
+                      (sitemap))
+      :theme "readable")

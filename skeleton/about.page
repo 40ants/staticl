@@ -1,0 +1,14 @@
+;;;;;
+title: About this site
+created-at: 2024-03-30
+format: spinneret
+;;;;;
+
+(:h2 "Subtitle")
+
+(:p "This is an example of a page written using Spinneret. It's main advantage is an ability to use Lisp for HTML generation.")
+(:p "You can execute any code to get data for the page - access a database or some API. Note that these actions will be performed
+          during the build stage and site itself will remain static.")
+(:p "Using Spinneret you can use any HTML markup. If you want to draw a red square, you just do it:")
+
+(:div :style "width: 200px; height: 200px; background: red;")

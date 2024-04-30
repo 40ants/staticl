@@ -1,0 +1,12 @@
+;;;;;
+title: The second post
+tags: example, bar
+created-at: 2024-04-30
+format: md
+;;;;;
+
+Another post. StatiCL is more versatile than Coleslaw, because of it's modular architecture.
+
+<!--more-->
+
+Following part only visible on the post page, not in the indices.

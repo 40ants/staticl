@@ -2,6 +2,7 @@
   (:use #:cl)
   (:import-from #:staticl/core
                 #:stage)
+  (:import-from #:staticl/skeleton)
   (:import-from #:defmain
                 #:subcommand
                 #:defcommand
@@ -43,4 +44,23 @@
            :stage-dir output-dir)
     (when *verbose*
       (format t "Site was written to: ~A~%"
+              (namestring output-dir)))))
+
+
+(defcommand (main new-site) ((output-dir "An output directory to write site files to."
+                                         :default (namestring
+                                                   (uiop:ensure-directory-pathname
+                                                    *default-pathname-defaults*)))
+                             (description "Site's description."
+                                          :default "A site description.")
+                             title url)
+  "Creates a new site skeleton with a few posts."
+  (let ((output-dir (uiop:ensure-directory-pathname
+                     output-dir)))
+    (staticl/skeleton:create-site output-dir
+                                  title
+                                  url
+                                  :description description)
+    (when *verbose*
+      (format t "Site's content was written to: ~A~%"
               (namestring output-dir)))))

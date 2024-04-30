@@ -25,3 +25,6 @@
 (asdf:register-system-packages "3bmd-ext-code-blocks" '("3BMD-CODE-BLOCKS"))
 (asdf:register-system-packages "fuzzy-dates" '("ORG.SHIRAKUMO.FUZZY-DATES"))
 (asdf:register-system-packages "feeder" '("ORG.SHIRAKUMO.FEEDER"))
+
+(asdf:register-system-packages "mystic" '("MYSTIC.UTIL"))
+(asdf:register-system-packages "mystic-file-mixin" '("MYSTIC.TEMPLATE.FILE"))
