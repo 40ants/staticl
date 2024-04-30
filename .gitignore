@@ -6,3 +6,4 @@
 *.fasl
 /example/stage/
 /stage/
+.DS_Store

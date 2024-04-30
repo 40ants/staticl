@@ -35,18 +35,22 @@
     {/if}
     <div class="fineprint">
       <hr>
-      Unless otherwise credited all material
-      {if $site.license}
-        {$site.license}
-      {else}
-        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US">
-          <img alt="Creative Commons License" style="border-width:0" src="/css/cc-by-sa.png" />
+      <div class="fineprint-items">
+        <span>
+        Unless otherwise credited all material
+        {if $site.license}
+          {$site.license}
+        {else}
+          <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US">
+            <img alt="Creative Commons License" style="border-width:0" src="/css/cc-by-sa.png" />
+          </a>
+        {/if}
+        </span>
+        {if $site.author}<span>by {$site.author}</span>{/if}
+        <a id="staticl-logo" href="https://github.com/40ants/staticl">
+          <img src="/img/staticl-logo-small.webp" style="height: 32px" alt="StatiCL logo" />
         </a>
-      {/if}
-      by {$site.author}
-      <a id="coleslaw-logo" href="https://github.com/redline6561/coleslaw">
-        <img src="/css/logo_small.jpg" alt="Coleslaw logo" />
-      </a>
+      </div>
     </div>
   </body>
 </html>
