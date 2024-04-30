@@ -1,35 +1,40 @@
-{namespace coleslaw.theme.hyde}
+{namespace coleslaw.theme.readable}
 
 {template index}
-<h1 class="title">{$content.title}</h1>
+<h1 class="page-header">{$content.title}</h1>
 {foreach $obj in $content.items}
-  <div class="article-meta">
-    <a class="article-title" href="{$obj.url}">{$obj.title}</a>
-    <div class="date"> posted on {$obj.created_at | date}</div>
-    <div class="article">{$obj.excerpt |noAutoescape}</div>
+  <div class="row-fluid">
+    <h1><a href="{$obj.url}">{$obj.title}</a></h1>
+    <p class="date-posted">posted on {$obj.created_at | date}</p>
+    {$obj.excerpt |noAutoescape}
+
     {if $obj.has_more}<p><a href="{$obj.url}">Read more...</a></p>{/if}
   </div>
 {/foreach}
 <div id="relative-nav">
-  {if $content.prev} <a href="{$content.prev.url}">Previous</a> {/if}
-  {if $content.next} <a href="{$content.next.url}">Next</a> {/if}
+  <ul class="pager">
+    {if $content.prev} <li class="previous"><a href="{$content.prev.url}">Previous</a></li> {/if}
+    {if $content.next} <li class="next"><a href="{$content.next.url}">Next</a></li> {/if}
+  </ul>
 </div>
 {if $content.tags}
-<div id="tagsoup">
+<div class="row-fluid">
   <p>This blog covers
     {foreach $tag in $content.tags}
       <a href="{$tag.url}">{$tag.name}</a>{nil}
       {if not isLast($tag)},{sp}{/if}
     {/foreach}
+  </p>
 </div>
 {/if}
 {if $months}
-<div id="monthsoup">
+<div class="row-fluid">
   <p>View content from
     {foreach $month in $content.months}
       <a href="{$month.url}">{$month.name}</a>{nil}
       {if not isLast($month)},{sp}{/if}
     {/foreach}
+  </p>
 </div>
 {/if}
 {/template}

@@ -1,5 +1,5 @@
 ;;; -*- mode : lisp -*-
-(in-package staticl-user)
+(in-package #:staticl-user)
 
 (asdf:load-system "staticl/format/spinneret")
 
@@ -17,12 +17,15 @@
                                                :page-title-fn (lambda (num)
                                                                 (fmt "Страница ~A" num)))
                               (rss :target-path #P"ru/blog/rss.xml")
-                              (atom :target-path #P"ru/blog/atom.xml"))
+                              (atom :target-path #P"ru/blog/atom.xml")
+                              (tags-index :target-path "ru/tags/"))
                       (filter (:path "ru/" :invert t)
                               (prev-next-links)
                               (paginated-index :target-path #P"blog/")
                               (rss :target-path #P"blog/rss.xml")
-                              (atom :target-path #P"blog/atom.xml"))
-                      (sitemap)
-                      ;; (rsync "my-site")
-                      ))
+                              (atom :target-path #P"blog/atom.xml")
+                              (tags-index :target-path "tags/"))
+                      (sitemap))
+      :theme "readable"
+      ;; :theme "hyde"
+      )
