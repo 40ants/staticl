@@ -80,7 +80,8 @@ You can install this library from Quicklisp, but you want to receive updates qui
 
 (defsection @usage (:title "Usage")
   "
-TODO: Write a library description. Put some examples here.
+StatiCL is a static site generator. StatiCL as a modular architecture and is suitable for any kind of a site
+be it a blog or a site with pages not included in the feeds. This project was created to overcome limitations of the Coleslaw.
 ")
 
 
