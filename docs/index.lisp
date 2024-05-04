@@ -76,20 +76,31 @@
                          @api)))
 
 
-(defsection @index (:title "staticl - Flexible static site generator."
+(defsection @index (:title "StatiCL - Flexible static site generator"
                     :ignore-words *ignore-words*)
+  ;; ""
+  
   (staticl system)
   "
-[![](https://github-actions.40ants.com/40ants/staticl/matrix.svg?only=ci.run-tests)](https://github.com/40ants/staticl/actions)
-
-![Quicklisp](http://quickdocs.org/badge/staticl.svg)
+<table>
+<tr>
+<td>
+<a href=\"https://github.com/40ants/staticl/actions\"><img src=\"https://github-actions.40ants.com/40ants/staticl/matrix.svg?only=ci.run-tests\"/></a>
+</td>
+<td rowspan=2>
+<img src=\"https://storage.yandexcloud.net/40ants-public/staticl/small-logo.webp\" title=\"StatiCL Logo\"/>
+</td>
+</tr>
+<tr>
+<td>
+<img src=\"http://quickdocs.org/badge/staticl.svg\" title=\"Quicklisp\"/>
+</td>
+</tr>
+</table>
 "
+  
   (@installation section)
-  (@introduction section)
-  ;; (@usage section)
-  ;; (@processing-pipeline section)
-  ;; (@api section)
-  )
+  (@introduction section))
 
 
 (defsection-copy @readme @index)
