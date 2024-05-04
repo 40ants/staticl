@@ -31,11 +31,13 @@
            #:site-content-root
            #:site-title
            #:make-site
-           #:site-plugins
            #:site-theme
            #:site-pipeline
            #:site-description
-           #:clean-urls-p))
+           #:clean-urls-p
+           #:site-navigation
+           #:site-charset
+           #:site-url))
 (in-package #:staticl/site)
 
 

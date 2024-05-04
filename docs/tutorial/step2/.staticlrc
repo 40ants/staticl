@@ -1,0 +1,9 @@
+;;; -*- mode : lisp -*-
+(in-package #:staticl-user)
+
+(site "Trivial Site"
+      :description "A trivial staticl site."
+      :url "https://example.com"
+      :pipeline (list (load-content)
+                      (rss))
+      :theme "readable")

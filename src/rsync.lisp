@@ -1,6 +1,7 @@
 (uiop:define-package #:staticl/rsync
   (:use #:cl)
-  (:export #:rsync))
+  (:export #:rsync
+           #:rsync-host))
 (in-package #:staticl/rsync)
 
 
@@ -13,5 +14,8 @@
 
 
 (defun rsync (host)
-  (make-instance 'rsync
-                 :host host))
+  (declare (ignore host))
+  (error "This node is not supported yet.")
+  ;; (make-instance 'rsync
+  ;;                :host host)
+  )

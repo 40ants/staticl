@@ -13,6 +13,7 @@
 
 (defclass post (content-from-file)
   ()
+  (:documentation "This is the class for a page which will not be included into the feed and indices.")
   (:default-initargs
    ;; In coleslaw page and post share the same template
    :template "post"))
@@ -29,5 +30,5 @@
     (values boolean &optional))
 
 (defun postp (content-item)
-  "Returns T if given object is a content of type POST."
+  "Returns T if given object is a content of POST class."
   (typep content-item 'post))

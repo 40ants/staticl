@@ -1,0 +1,8 @@
+;;;;;
+title: An index page.
+created-at: 2024-03-30
+format: md
+;;;;;
+
+This is a front page of example site. The site uses StatiCL generator written in Common Lisp.
+

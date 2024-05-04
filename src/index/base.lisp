@@ -20,7 +20,6 @@
            #:page-items
            #:prev-page
            #:next-page
-           #:index-page-template
            #:base-index
            #:index-target-path
            #:page-size

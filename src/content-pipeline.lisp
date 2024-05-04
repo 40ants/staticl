@@ -7,7 +7,8 @@
   (:import-from #:serapeum
                 #:soft-list-of
                 #:->)
-  (:export #:load-content))
+  (:export #:load-content
+           #:exclude-patterns))
 (in-package #:staticl/content-pipeline)
 
 

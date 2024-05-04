@@ -3,7 +3,6 @@
   (:import-from #:staticl/site
                 #:site-content-root
                 #:site-theme
-                #:site-plugins
                 #:site-url
                 #:make-site)
   (:import-from #:staticl/content
@@ -21,8 +20,7 @@
   (:import-from #:staticl/url
                 #:with-base-url)
   (:nicknames #:staticl/core)
-  (:export #:generate
-           #:stage))
+  (:export #:stage))
 (in-package #:staticl)
 
 

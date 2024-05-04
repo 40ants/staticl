@@ -4,6 +4,6 @@
 .#*
 .*.~undo-tree~
 *.fasl
-/example/stage/
-/stage/
+stage/
 .DS_Store
+roswell/staticl
