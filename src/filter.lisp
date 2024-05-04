@@ -10,7 +10,9 @@
                 #:content)
   (:import-from #:staticl/current-root
                 #:current-root)
-  (:export #:filter))
+  (:export #:filter
+           #:filter-fn
+           #:pipeline-items))
 (in-package #:staticl/filter)
 
 

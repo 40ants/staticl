@@ -15,7 +15,8 @@
            #:template-vars
            #:render
            #:list-static
-           #:copy-static))
+           #:copy-static
+           #:theme-path))
 (in-package #:staticl/theme)
 
 

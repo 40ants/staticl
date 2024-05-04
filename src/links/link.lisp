@@ -11,8 +11,8 @@
                 #:object-url)
   (:import-from #:staticl/site
                 #:site)
-  (:export
-   #:link))
+  (:export #:link
+           #:link-content))
 (in-package #:staticl/links/link)
 
 
