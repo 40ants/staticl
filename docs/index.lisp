@@ -19,6 +19,8 @@
                 #:@introduction)
   (:import-from #:serapeum
                 #:eval-always)
+  (:import-from #:40ants-doc/locatives/asdf-system
+                #:asdf-system-documentation-title)
   (:export #:@index
            #:@readme
            #:@changelog))
@@ -52,6 +54,10 @@
       "XML"
       "SEO"
       "GIT")))
+
+
+(defmethod asdf-system-documentation-title ((system (eql (asdf:find-system "staticl"))))
+  "ASDF System Details")
 
 
 (defmethod docs-config ((system (eql (asdf:find-system "staticl-docs"))))
