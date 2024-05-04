@@ -14,6 +14,7 @@
 
 
 (defun rsync (host)
+  (declare (ignore host))
   (error "This node is not supported yet.")
   ;; (make-instance 'rsync
   ;;                :host host)
