@@ -1,5 +1,5 @@
 ;;;;;
-title: An index page.
+title: An index page
 created-at: 2024-03-30 08:18:05
 format: md
 ;;;;;
@@ -11,3 +11,4 @@ Englush are available at [/blog/](/blog/) URL whereas posts in Russian can be fo
 [/ru/blog/](/ru/blog/). Each blog has it's own rss feeds, but all pages are gathered into a
 single [sitemap.xml](/sitemap.xml) file.
 
+You can edit it as you want.

@@ -304,7 +304,22 @@
            (content-vars (template-vars site content))
            (site-vars (template-vars site site))
            (vars (dict "site" site-vars
-                       "content" content-vars))
+                       "content" content-vars
+                       "injections"
+                       (dict "head"
+                             (list "
+<script>
+var eventSource = new EventSource('/events');
+
+eventSource.addEventListener('reload-page', function(event) {
+  console.log('Reloading the page');
+  location.reload();
+});
+
+eventSource.onerror = function(err) {
+  console.error('EventSource failed:', err);
+};
+</script>"))))
            (template-name (content-template content)))
 
       (staticl/theme:render theme template-name vars stream))))

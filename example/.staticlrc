@@ -26,6 +26,6 @@
                               (atom :target-path #P"blog/atom.xml")
                               (tags-index :target-path "tags/"))
                       (sitemap))
-      ;; :theme "readable"
-      :theme "hyde"
+      :theme "readable"
+      ;; :theme "hyde"
       )
