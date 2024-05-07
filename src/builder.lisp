@@ -24,13 +24,15 @@
 
 (-> generate (&key
               (:root-dir (or pathname string))
-              (:stage-dir (or pathname string)))
+              (:stage-dir (or pathname string))
+              (:alter-pipeline function))
     (values pathname &optional))
 
 (defun generate (&key
                  (root-dir *default-pathname-defaults*)
                  (stage-dir (merge-pathnames (make-pathname :directory '(:relative "stage"))
-                                             (uiop:ensure-directory-pathname root-dir))))
+                                             (uiop:ensure-directory-pathname root-dir)))
+                 (alter-pipeline #'identity))
   (let* ((root-dir
            ;; Here we ensure both root and stage dirs are absolute and point to the directories
            (merge-pathnames
@@ -41,7 +43,8 @@
          (site (make-site root-dir)))
     (with-current-root ((site-content-root site))
       (with-base-url ((site-url site))
-        (loop with all-content = (execute-pipeline site)
+        (loop with all-content = (execute-pipeline site
+                                                   :alter-pipeline alter-pipeline)
               for content in all-content
               do (write-content site content stage-dir))))
 

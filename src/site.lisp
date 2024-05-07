@@ -75,7 +75,7 @@
           :reader site-theme
           :documentation "A theme object for the site.")
    (pipeline :initarg :pipeline
-             ;; :type (soft-list-of plugin)
+             :type list
              :reader site-pipeline
              :documentation "A list of pipline nodes"))
   (:default-initargs

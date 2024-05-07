@@ -16,6 +16,8 @@
                 #:object-url)
   (:import-from #:staticl/current-root
                 #:current-root)
+  (:import-from #:staticl/injections
+                #:content-with-injections-mixin)
   (:export #:index-page
            #:page-items
            #:prev-page
@@ -53,7 +55,7 @@
    :template *default-template*))
 
 
-(defclass index-page (content)
+(defclass index-page (content-with-injections-mixin content)
   ((target-path :initarg :target-path
                 :type pathname
                 :documentation "Relative pathname to a file with page content."
@@ -119,7 +121,7 @@
              (staticl/url:object-url site (next-page content))))))
   
   (if (next-method-p)
-      (call-next-method content :hash hash)
+      (call-next-method site content :hash hash)
       (values hash)))
 
 

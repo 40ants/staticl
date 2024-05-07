@@ -13,12 +13,20 @@
   (:import-from #:serapeum
                 #:->
                 #:fmt)
+  (:import-from #:staticl/event
+                #:with-event-waiting
+                #:event
+                #:make-event
+                #:wait
+                #:notify)
   (:import-from #:bordeaux-threads-2
                 #:destroy-thread
                 #:thread-alive-p
                 #:make-thread
                 #:lock
-                #:condition-variable))
+                #:condition-variable)
+  (:import-from #:staticl/plugins/autoreload
+                #:autoreload))
 (in-package #:staticl/server)
 
 (defvar *app* nil)
@@ -57,9 +65,9 @@
                             full-path))))))
 
 
-(-> make-app (pathname condition-variable lock))
+(-> make-app (pathname event))
 
-(defun make-app (root update-condition update-condition-lock)
+(defun make-app (root event)
   (flet ((docs-server-app (env)
            (cond
              ((string-equal (getf env :path-info)
@@ -76,33 +84,31 @@
 
                   (handler-case
                       (unwind-protect
-                           (loop for event-received = (bt2:with-lock-held (update-condition-lock)
-                                                        (bt2:condition-wait update-condition update-condition-lock
-                                                                            ;; Every 5 seconds we'll send a ping
-                                                                            ;; event to ensure the connection is
-                                                                            ;; open or will close connection otherwise.
-                                                                            :timeout 5))
-                                 do (cond
-                                      (event-received
-                                       (log:debug "Sending event to reload the page to" remote-side)
-                                       (write-string (fmt "id: ~A" (incf event-id)) stream)
-                                       (terpri stream)
-                                       (write-string "event: reload-page" stream)
-                                       (terpri stream)
-                                       (write-string "data: {}" stream)
-                                       (terpri stream)
-                                       (terpri stream))
-                                      (t
-                                       (log:debug "Sending ping event to" remote-side)
-                                       (write-string (fmt "id: ~A" (incf event-id)) stream)
-                                       (terpri stream)
-                                       (write-string "event: ping" stream)
-                                       (terpri stream)
-                                       (write-string "data: {}" stream)
-                                       (terpri stream)
-                                       (terpri stream)
-                                       ))
-                                    (sleep 1))
+                           (with-event-waiting (event)
+                             (loop for event-received = (wait ;; Every 5 seconds we'll send a ping
+                                                              ;; event to ensure the connection is
+                                                              ;; open or will close connection otherwise.
+                                                              :timeout 5)
+                                   do (cond
+                                        (event-received
+                                         (log:debug "Sending event to reload the page to" remote-side)
+                                         (write-string (fmt "id: ~A" (incf event-id)) stream)
+                                         (terpri stream)
+                                         (write-string "event: reload-page" stream)
+                                         (terpri stream)
+                                         (write-string "data: {}" stream)
+                                         (terpri stream)
+                                         (terpri stream))
+                                        (t
+                                         (log:debug "Sending ping event to" remote-side)
+                                         (write-string (fmt "id: ~A" (incf event-id)) stream)
+                                         (terpri stream)
+                                         (write-string "event: ping" stream)
+                                         (terpri stream)
+                                         (write-string "data: {}" stream)
+                                         (terpri stream)
+                                         (terpri stream)
+                                         ))))
                         (finish-output stream))
                     ((or
                       sb-int:broken-pipe
@@ -157,54 +163,64 @@
       (log:debug "Stopping an old server")
       (stop))
 
-    (let* ((real-stage-dir (staticl/builder::generate :root-dir root-dir
-                                                      :stage-dir stage-dir))
-           (port (or port
-                     (available-port interface)))
-           (update-condition (bordeaux-threads-2:make-condition-variable :name "Static site updated"))
-           (update-condition-lock (bordeaux-threads-2:make-lock :name "Static site updated (lock)"))
-           (app (make-app real-stage-dir update-condition update-condition-lock))
-           (server (progn
-                     (log:info "Starting Clack server to serve site from ~A" real-stage-dir)
-                     (clack:clackup app
-                                    :port port
-                                    :address interface)))
-           (url (format nil "http://~A:~A/"
-                        interface port)))
-      (open-browser url)
-    
-      (labels ((build-site (changed-file)
-                 (unless (in-subdir-p real-stage-dir changed-file)
-                   (log:info "File ~A was changed. Rebuilding the site at ~A"
-                             changed-file
-                             root-dir)
-                   (handler-case
-                       (staticl/builder::generate :root-dir root-dir
-                                                  :stage-dir stage-dir)
-                     (serious-condition (condition)
-                       (log:error "Unable to build static for ~A system: ~A"
-                                  root-dir
-                                  condition)))
-                   
-                   ;; Notifying the browser that it must reload the page:
-                   (bordeaux-threads-2:condition-broadcast update-condition)))
-               
-               (run-site-autobuilder ()
-                 (fs-watcher:watch dirs-to-watch #'build-site)))
-        (cond
-          (in-thread
-           (setf *app* app)
-           (setf *server* server)
-           (setf *thread*
-                 (make-thread #'run-site-autobuilder
-                              :name (format nil "Site Autobuilder for ~A: ~A"
-                                            root-dir url))))
-          (t
-           (unwind-protect
-                (run-site-autobuilder)
-             (clack:stop server))))
+    (labels ((alter-pipeline (pipeline)
+               (append pipeline
+                       ;; Here we add a node which will inject
+                       ;; a piece of code which will listen for
+                       ;; server side event and reload code
+                       ;; when static was regenerated:
+                       (list (autoreload))))
+             (generate-content ()
+               (staticl/builder::generate :root-dir root-dir
+                                          :stage-dir stage-dir
+                                          :alter-pipeline #'alter-pipeline)))
+      (declare (dynamic-extent #'generate-content
+                               #'alter-pipeline))
+      (let* ((real-stage-dir (generate-content))
+             (port (or port
+                       (available-port interface)))
+             (event (make-event "Static site updated"))
+             (app (make-app real-stage-dir event))
+             (server (progn
+                       (log:info "Starting Clack server to serve site from ~A" real-stage-dir)
+                       (clack:clackup app
+                                      :port port
+                                      :address interface)))
+             (url (format nil "http://~A:~A/"
+                          interface port)))
+        (open-browser url)
+       
+        (labels ((build-site (changed-file)
+                   (unless (in-subdir-p real-stage-dir changed-file)
+                     (log:info "File ~A was changed. Rebuilding the site at ~A"
+                               changed-file
+                               root-dir)
+                     (handler-case
+                         (generate-content)
+                       (serious-condition (condition)
+                         (log:error "Unable to build static for ~A system: ~A"
+                                    root-dir
+                                    condition)))
+                    
+                     ;; Notifying the browser that it must reload the page:
+                     (notify event)))
+                
+                 (run-site-autobuilder ()
+                   (fs-watcher:watch dirs-to-watch #'build-site)))
+          (cond
+            (in-thread
+             (setf *app* app)
+             (setf *server* server)
+             (setf *thread*
+                   (make-thread #'run-site-autobuilder
+                                :name (format nil "Site Autobuilder for ~A: ~A"
+                                              root-dir url))))
+            (t
+             (unwind-protect
+                  (run-site-autobuilder)
+               (clack:stop server))))
 
-        (values)))))
+          (values))))))
 
 
 (-> stop ()

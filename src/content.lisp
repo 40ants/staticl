@@ -48,6 +48,8 @@
                 #:content-html)
   (:import-from #:staticl/clean-urls
                 #:transform-filename)
+  (:import-from #:staticl/injections
+                #:content-with-injections-mixin)
   (:export #:supported-content-types
            #:content-type
            #:content
@@ -121,6 +123,7 @@
 
 (defclass content-from-file (content-with-title-mixin
                              content-with-tags-mixin
+                             content-with-injections-mixin
                              content)
   ((format :initarg :format
            :type string
@@ -304,29 +307,14 @@
            (content-vars (template-vars site content))
            (site-vars (template-vars site site))
            (vars (dict "site" site-vars
-                       "content" content-vars
-                       "injections"
-                       (dict "head"
-                             (list "
-<script>
-var eventSource = new EventSource('/events');
-
-eventSource.addEventListener('reload-page', function(event) {
-  console.log('Reloading the page');
-  location.reload();
-});
-
-eventSource.onerror = function(err) {
-  console.error('EventSource failed:', err);
-};
-</script>"))))
+                       "content" content-vars))
            (template-name (content-template content)))
 
       (staticl/theme:render theme template-name vars stream))))
 
 
-(defgeneric preprocess (site plugin content-objects)
-  (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
+;; (defgeneric preprocess (site plugin content-objects)
+;;   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
 (defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
@@ -407,7 +395,7 @@ eventSource.onerror = function(err) {
                 (content-tags content)))
   
   (if (next-method-p)
-      (call-next-method content :hash hash)
+      (call-next-method site content :hash hash)
       (values hash)))
 
 

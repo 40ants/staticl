@@ -21,6 +21,10 @@ For objects in `content.items` attribute `obj.text` was renamed to `obj.excerpt`
 
 Coleslaw always rendered pages where posts are grouped by tags. But with Staticl you have to include TAGS-INDEX function call into the site's pipeline. Without this step, tag objects will not have a \"url\" slot and template might be ready to render tags without the URL.
 
+## Injections
+
+In Coleslaw there was a `injections` variable. Now it was moved to `content.injections` variable. Also, instead of two injection points `head` and `body`, `StatiCL` has `head`, `before_content` and `after_content`.
+
 ## Other field renames
 
 - `pubdate -> site.pubdate`

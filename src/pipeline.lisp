@@ -34,10 +34,10 @@
   (funcall *remove-item-func* item))
 
 
-(-> execute-pipeline (site)
+(-> execute-pipeline (site &key (:alter-pipeline function))
     (values (soft-list-of content)))
 
-(defun execute-pipeline (site)
+(defun execute-pipeline (site &key (alter-pipeline #'identity))
   (let ((known-items nil)
         (items-to-remove nil))
     (flet ((produce-item-func (item)
@@ -54,7 +54,8 @@
       
       (let ((*produce-item-func* #'produce-item-func)
             (*remove-item-func* #'remove-item-func))
-        (loop for pipeline-node in (site-pipeline site)
+        (loop for pipeline-node in (funcall alter-pipeline
+                                            (site-pipeline site))
               do (process-items site pipeline-node known-items)
                  (when items-to-remove
                    ;; This is N*M complexity, but length of items-to-remove
