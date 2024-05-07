@@ -6,7 +6,11 @@
                 #:site)
   (:import-from #:staticl/injections
                 #:add-injection
-                #:content-with-injections-mixin))
+                #:content-with-injections-mixin)
+  (:import-from #:staticl/content
+                #:has-tag-p)
+  (:import-from #:serapeum
+                #:->))
 (in-package #:staticl/plugins/mathjax)
 
 
@@ -28,15 +32,30 @@ MathJax = {
 
 
 (defclass mathjax (plugin)
-  ())
+  ((force :initarg :force
+          :initform nil
+          :reader force-mathjax-p)
+   (tag-name :initarg :tag-name
+             :initform "math"
+             :reader math-tag-name)))
 
 
-(defun mathjax ()
-  (make-instance 'mathjax))
+(-> mathjax (&key
+             (:force boolean)
+             (:tag-name (or null string)))
+    (values mathjax &optional))
+
+(defun mathjax (&key force (tag-name "math"))
+  "Enables MathJAX on the page if it's content has tag equal to the TAG-NAME or if FORCE argument was given."
+  (make-instance 'mathjax
+                 :force force
+                 :tag-name tag-name))
 
 
 (defmethod staticl/pipeline:process-items ((site site) (node mathjax) content-items)
   (loop for item in content-items
-        when (typep item 'content-with-injections-mixin)
+        when (and (typep item 'content-with-injections-mixin)
+                  (or (force-mathjax-p node)
+                      (has-tag-p item (math-tag-name node))))
         do (add-injection item "head"
                           *code-to-inject*)))

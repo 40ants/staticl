@@ -35,6 +35,7 @@
                 #:class-slots
                 #:slot-definition-initargs)
   (:import-from #:staticl/tag
+                #:tag-name
                 #:tag)
   (:import-from #:staticl/format
                 #:to-html)
@@ -73,7 +74,8 @@
            #:set-metadata
            #:content-tags
            #:content-metadata
-           #:content-file-type))
+           #:content-file-type
+           #:has-tag-p))
 (in-package #:staticl/content)
 
 
@@ -119,6 +121,19 @@
          :reader content-tags))
   (:default-initargs
    :tags nil))
+
+
+(defgeneric has-tag-p (content tag-name)
+  (:documentation "Returns T if content has a given TAG-NAME. For content which does not support tags, returns NIL.")
+  
+  (:method ((content t) (tag-name string))
+    nil)
+  (:method ((content content-with-tags-mixin) (tag-name string))
+    (when (member tag-name
+                  (content-tags content)
+                  :key #'tag-name
+                  :test #'string-equal)
+      t)))
 
 
 (defclass content-from-file (content-with-title-mixin

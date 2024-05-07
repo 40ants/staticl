@@ -4,6 +4,7 @@
                 #:dict
                 #:soft-list-of)
   (:import-from #:staticl/content
+                #:has-tag-p
                 #:content-template
                 #:write-content-to-stream
                 #:get-target-filename
@@ -130,3 +131,9 @@
          (relative-path (enough-namestring (page-target-path index)
                                            root)))
     (uiop:unix-namestring relative-path)))
+
+
+(defmethod has-tag-p ((index index-page) (tag-name string))
+  "For index pages this method will return T if at least one content item on the page has required tag name."
+  (loop for item in (page-items index)
+        thereis (has-tag-p item tag-name)))
