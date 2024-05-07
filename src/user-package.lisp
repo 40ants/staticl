@@ -13,6 +13,8 @@
                 #:prev-next-links)
   (:import-from #:staticl/plugins/sitemap
                 #:sitemap)
+  (:import-from #:staticl/plugins/mathjax
+                #:mathjax)
   (:import-from #:staticl/site
                 #:site)
   (:import-from #:staticl/content-pipeline
