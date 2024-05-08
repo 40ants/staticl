@@ -15,6 +15,8 @@
                 #:sitemap)
   (:import-from #:staticl/plugins/mathjax
                 #:mathjax)
+  (:import-from #:staticl/plugins/disqus
+                #:disqus)
   (:import-from #:staticl/site
                 #:site)
   (:import-from #:staticl/content-pipeline

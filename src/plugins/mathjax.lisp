@@ -38,9 +38,6 @@ MathJax = {
 
 ")
 
-"
-"
-
 
 (defclass mathjax (plugin)
   ((force :initarg :force
