@@ -29,6 +29,7 @@
                 #:autoreload))
 (in-package #:staticl/server)
 
+(defvar *port* nil)
 (defvar *app* nil)
 (defvar *server* nil)
 (defvar *thread* nil)
@@ -188,6 +189,7 @@
                                       :address interface)))
              (url (format nil "http://~A:~A/"
                           interface port)))
+        (setf *port* port)
         (open-browser url)
        
         (labels ((build-site (changed-file)
@@ -229,7 +231,8 @@
 (defun stop ()
   (when *server*
     (clack:stop *server*)
-    (setf *server* nil))
+    (setf *server* nil)
+    (setf *port* nil))
   (when *thread*
     (when (thread-alive-p *thread*)
       (destroy-thread *thread*))

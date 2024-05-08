@@ -1,7 +1,7 @@
 {namespace coleslaw.theme.readable}
 
 {template post}
-<div class="row-fluid">{\n}
+<div class="row-fluid content">{\n}
   <h1 class="page-header">{$content.title}</h1>{\n}
   <p>
     {if $content.tags}
@@ -12,8 +12,8 @@
     {/if}
   </p>
   <p class="date-posted">
-    {if $content.date}
-      Written on {$content.date}
+    {if $content.created_at}
+      Written on {$content.created_at | date}
     {/if}
   </p>
 

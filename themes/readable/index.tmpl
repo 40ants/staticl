@@ -3,8 +3,8 @@
 {template index}
 <h1 class="page-header">{$content.title}</h1>
 {foreach $obj in $content.items}
-  <div class="row-fluid">
-    <h1><a href="{$obj.url}">{$obj.title}</a></h1>
+  <div class="row-fluid excerpt">
+    <h2><a href="{$obj.url}">{$obj.title}</a></h2>
     <p class="date-posted">posted on {$obj.created_at | date}</p>
     {$obj.excerpt |noAutoescape}
 

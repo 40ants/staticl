@@ -6,7 +6,7 @@
   <div class="article-meta">
     <a class="article-title" href="{$obj.url}">{$obj.title}</a>
     <div class="date"> posted on {$obj.created_at | date}</div>
-    <div class="article">{$obj.excerpt |noAutoescape}</div>
+    <div class="excerpt">{$obj.excerpt |noAutoescape}</div>
     {if $obj.has_more}<p><a href="{$obj.url}">Read more...</a></p>{/if}
   </div>
 {/foreach}

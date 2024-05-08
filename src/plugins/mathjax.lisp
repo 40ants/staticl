@@ -14,9 +14,16 @@
 (in-package #:staticl/plugins/mathjax)
 
 
+;; Here we explicitly tell MathJax to work only inside "content" and "excerpt"
+;; HTML nodes, because "staticl-page" class should be on each "body" node
+;; in StatiCL themes.
 (defparameter *code-to-inject* "
 <script>
 MathJax = {
+  options: {
+    ignoreHtmlClass: 'staticl-page',
+    processHtmlClass: 'content|excerpt'
+  },
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)'], ['\\[', '\\]']]
   },
@@ -28,7 +35,11 @@ MathJax = {
 
 <script src='https://polyfill.io/v3/polyfill.min.js?features=es6'></script>
 <script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+
 ")
+
+"
+"
 
 
 (defclass mathjax (plugin)
@@ -57,5 +68,5 @@ MathJax = {
         when (and (typep item 'content-with-injections-mixin)
                   (or (force-mathjax-p node)
                       (has-tag-p item (math-tag-name node))))
-        do (add-injection item "head"
+        do (add-injection item "after_content"
                           *code-to-inject*)))

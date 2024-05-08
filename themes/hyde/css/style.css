@@ -7,7 +7,7 @@ a.anchor { color: black }
 .title { margin-left: 1em }
 .article-meta { margin-left: 2.2em; margin-bottom: 2.2em }
 .archive-title { font-size: 1em } .article-title { font-size: 2em }
-.article-content { margin-left: 2.2em }
+.content { margin-left: 2.2em }
 .fineprint { font-size: .9em; margin-top: .5em; display: flex; flex-direction: column}
 .fineprint > hr {width: 100%}
 .fineprint-items {display: flex; gap: 2rem; justify-content: center; align-items: center;}
@@ -64,7 +64,7 @@ span.paren6:hover { color : inherit; background-color : #FFBAFF; }
         margin-bottom: 1em;
     }
 
-    .article-meta, .article-content {
+    .article-meta, .content {
         float: left;
         margin-left: 0em;
         margin-right: 0em;
@@ -72,7 +72,7 @@ span.paren6:hover { color : inherit; background-color : #FFBAFF; }
         padding-left: 5%;
     }
 
-    .article, .article-content {
+    .excerpt, .content {
         margin-left: 0em;
         text-align: justify;
     }
