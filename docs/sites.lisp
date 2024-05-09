@@ -15,7 +15,7 @@
   """
 Here is a list of sites which use `StatiCL` to generate HTML:
 
-* https://40ants.com/ ([sources](https://github.com/40ants/40ants.github.com)).
+* <https://40ants.com/> ([sources](https://github.com/40ants/40ants.github.com)).
 
 Feel free to create PR to add your site here. It will be intresting to share configurations, themes and plugins!
 """)
