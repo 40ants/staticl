@@ -13,6 +13,10 @@
                 #:prev-next-links)
   (:import-from #:staticl/plugins/sitemap
                 #:sitemap)
+  (:import-from #:staticl/plugins/mathjax
+                #:mathjax)
+  (:import-from #:staticl/plugins/disqus
+                #:disqus)
   (:import-from #:staticl/site
                 #:site)
   (:import-from #:staticl/content-pipeline
@@ -29,3 +33,5 @@
                 #:paginated-index)
   (:import-from #:staticl/index/tags
                 #:tags-index))
+(in-package #:staticl-user)
+

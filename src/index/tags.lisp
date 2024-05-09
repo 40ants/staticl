@@ -28,7 +28,13 @@
   (:import-from #:staticl/theme
                 #:template-vars)
   (:import-from #:staticl/url
-                #:object-url))
+                #:object-url)
+  (:import-from #:staticl/utils
+                #:slot-documentation)
+  (:export
+   #:tags-index
+   #:page-filename-fn
+   #:page-title-fn))
 (in-package #:staticl/index/tags)
 
 
@@ -93,6 +99,31 @@
   (declare (ignore target-path page-size template page-title-fn page-filename-fn))
   (apply #'make-instance 'tags-index
          initargs))
+
+
+(let ((docs
+        (fmt "
+Creates additional HTML files with post's excerpts grouped by tag names.
+
+By default `some.html`, `another.html` filenames are used, but this
+can be overriden by PAGE-FILENAME-FN argument.
+
+The same way page title may be overriden by providing a function as PAGE-TITLE-FN argument.
+
+# Arguments:
+
+**PAGE-FILENAME-FN**:
+
+~A
+
+**PAGE-TITLE-FN**:
+
+~A
+"
+             (slot-documentation 'tags-index 'page-filename-fn)
+             (slot-documentation 'tags-index 'page-title-fn))))
+  (setf (documentation 'tags-index 'function)
+        docs))
 
 
 (defclass bound-tag (tag)

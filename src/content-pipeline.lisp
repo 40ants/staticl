@@ -21,6 +21,10 @@
     (values load-content &optional))
 
 (defun load-content (&key (exclude (list ".qlot")))
+  "Reads content from the disk.
+
+   By default only `post` and `page` files are loaded. But this list could be extended if you'll define
+   a custom site class and a method for STATICL/CONTENT:SUPPORTED-CONTENT-TYPES generic-function."
   (make-instance 'load-content
                  :exclude exclude))
 

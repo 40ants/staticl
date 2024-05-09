@@ -19,6 +19,12 @@
                 #:@introduction)
   (:import-from #:serapeum
                 #:eval-always)
+  (:import-from #:40ants-doc/locatives/asdf-system
+                #:asdf-system-documentation-title)
+  (:import-from #:staticl-docs/making-a-static-site
+                #:@making-a-site)
+  (:import-from #:staticl-docs/pipeline
+                #:@pipeline)
   (:export #:@index
            #:@readme
            #:@changelog))
@@ -54,6 +60,10 @@
       "GIT")))
 
 
+(defmethod asdf-system-documentation-title ((system (eql (asdf:find-system "staticl"))))
+  "ASDF System Details")
+
+
 (defmethod docs-config ((system (eql (asdf:find-system "staticl-docs"))))
   ;; 40ANTS-DOC-THEME-40ANTS system will bring
   ;; as dependency a full 40ANTS-DOC but we don't want
@@ -67,23 +77,36 @@
         (find-symbol "40ANTS-THEME"
                      (find-package "40ANTS-DOC-THEME-40ANTS"))
         :root-sections '(@index
+                         @making-a-site
+                         @pipeline
                          @api)))
 
 
-(defsection @index (:title "staticl - Flexible static site generator."
+(defsection @index (:title "StatiCL - Flexible static site generator"
                     :ignore-words *ignore-words*)
+  ;; ""
+  
   (staticl system)
   "
-[![](https://github-actions.40ants.com/40ants/staticl/matrix.svg?only=ci.run-tests)](https://github.com/40ants/staticl/actions)
-
-![Quicklisp](http://quickdocs.org/badge/staticl.svg)
+<table>
+<tr>
+<td>
+<a href=\"https://github.com/40ants/staticl/actions\"><img src=\"https://github-actions.40ants.com/40ants/staticl/matrix.svg?only=ci.run-tests\"/></a>
+</td>
+<td rowspan=2>
+<img src=\"https://storage.yandexcloud.net/40ants-public/staticl/small-logo.webp\" title=\"StatiCL Logo\"/>
+</td>
+</tr>
+<tr>
+<td>
+<img src=\"http://quickdocs.org/badge/staticl.svg\" title=\"Quicklisp\"/>
+</td>
+</tr>
+</table>
 "
+  
   (@installation section)
-  (@introduction section)
-  ;; (@usage section)
-  ;; (@processing-pipeline section)
-  ;; (@api section)
-  )
+  (@introduction section))
 
 
 (defsection-copy @readme @index)

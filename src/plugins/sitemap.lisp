@@ -6,7 +6,8 @@
                 #:write-content-to-stream
                 #:get-target-filename
                 #:content
-                #:preprocess)
+                ;; #:preprocess
+                )
   (:import-from #:staticl/site
                 #:site)
   (:import-from #:serapeum
@@ -15,7 +16,9 @@
                 #:make-url
                 #:render-sitemap)
   (:import-from #:staticl/url
-                #:object-url))
+                #:object-url)
+  (:export
+   #:sitemap))
 (in-package #:staticl/plugins/sitemap)
 
 
@@ -33,11 +36,11 @@
              :reader sitemap-content)))
 
 
-(defmethod preprocess ((site site) (sitemap sitemap) contents)
-  (error "Old function will be removed!")
-  ;; (list (make-instance 'sitemap-file
-  ;;                      :contents contents))
-  )
+;; (defmethod preprocess ((site site) (sitemap sitemap) contents)
+;;   (error "Old function will be removed!")
+;;   ;; (list (make-instance 'sitemap-file
+;;   ;;                      :contents contents))
+;;   )
 
 
 (defmethod get-target-filename ((site site) (sitemap sitemap-file) stage-dir)

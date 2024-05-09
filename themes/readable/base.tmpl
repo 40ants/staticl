@@ -10,13 +10,13 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/css/custom.css" rel="stylesheet" media="screen">
     <link rel="alternate" href="/rss.xml" type="application/rss+xml" />
-    {if $injections.head}
-      {foreach $injection in $injections.head}
+    {if $content.injections.head}
+      {foreach $injection in $content.injections.head}
         {$injection |noAutoescape}
       {/foreach}
     {/if}
   </head>
-  <body>
+  <body class="staticl-page">
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="offset2 span8">
@@ -33,14 +33,22 @@
                 </ul>
               </div>
             </div>
-          </div>  
+          </div>
+          
+          {if $content.injections.before_content}
+            {foreach $injection in $content.injections.before_content}
+              <div class="row-fluid">
+                {$injection |noAutoescape}
+              </div>
+            {/foreach}
+          {/if}
 
           <div class="row-fluid">
             {$raw |noAutoescape}
           </div>
 
-          {if $injections.body}
-            {foreach $injection in $injections.body}
+          {if $content.injections.after_content}
+            {foreach $injection in $content.injections.after_content}
               <div class="row-fluid">
                 {$injection |noAutoescape}
               </div>

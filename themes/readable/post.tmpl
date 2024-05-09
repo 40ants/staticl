@@ -1,7 +1,7 @@
 {namespace coleslaw.theme.readable}
 
 {template post}
-<div class="row-fluid">{\n}
+<div class="row-fluid content">{\n}
   <h1 class="page-header">{$content.title}</h1>{\n}
   <p>
     {if $content.tags}
@@ -12,16 +12,16 @@
     {/if}
   </p>
   <p class="date-posted">
-    {if $content.date}
-      Written on {$content.date}
+    {if $content.created_at}
+      Written on {$content.created_at | date}
     {/if}
   </p>
 
   {$content.html |noAutoescape}
   
   <ul class="pager">
-    {if $content.prev}<li class="previous"><a href="{$content.prev.url}">&larr; Previous</a></li>{/if}{\n}
-    {if $content.next}<li class="next"><a href="{$content.next.url}">Next &rarr;</a></li>{/if}{\n}
+    {if $content.prev}<li class="previous"><a href="{$content.prev.url}" title="{$content.prev.title}">&larr; Previous</a></li>{/if}{\n}
+    {if $content.next}<li class="next"><a href="{$content.next.url}" title="{$content.next.title}">Next &rarr;</a></li>{/if}{\n}
   </ul>
 </div>{\n}
 {/template}

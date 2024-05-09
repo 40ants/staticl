@@ -16,6 +16,7 @@
                 #:with-output-to-file
                 #:length=)
   (:import-from #:staticl/utils
+                #:comma-split
                 #:normalize-plist
                 #:do-files)
   (:import-from #:staticl/content/reader
@@ -35,6 +36,7 @@
                 #:class-slots
                 #:slot-definition-initargs)
   (:import-from #:staticl/tag
+                #:tag-name
                 #:tag)
   (:import-from #:staticl/format
                 #:to-html)
@@ -48,6 +50,8 @@
                 #:content-html)
   (:import-from #:staticl/clean-urls
                 #:transform-filename)
+  (:import-from #:staticl/injections
+                #:content-with-injections-mixin)
   (:export #:supported-content-types
            #:content-type
            #:content
@@ -56,7 +60,7 @@
            #:content-class
            #:write-content-to-stream
            #:write-content
-           #:preprocess
+           ;; #:preprocess
            #:get-target-filename
            #:content-with-title-mixin
            #:content-with-tags-mixin
@@ -71,7 +75,8 @@
            #:set-metadata
            #:content-tags
            #:content-metadata
-           #:content-file-type))
+           #:content-file-type
+           #:has-tag-p))
 (in-package #:staticl/content)
 
 
@@ -119,8 +124,22 @@
    :tags nil))
 
 
+(defgeneric has-tag-p (content tag-name)
+  (:documentation "Returns T if content has a given TAG-NAME. For content which does not support tags, returns NIL.")
+  
+  (:method ((content t) (tag-name string))
+    nil)
+  (:method ((content content-with-tags-mixin) (tag-name string))
+    (when (member tag-name
+                  (content-tags content)
+                  :key #'tag-name
+                  :test #'string-equal)
+      t)))
+
+
 (defclass content-from-file (content-with-title-mixin
                              content-with-tags-mixin
+                             content-with-injections-mixin
                              content)
   ((format :initarg :format
            :type string
@@ -169,10 +188,9 @@
                                     (etypecase value
                                       (list value)
                                       (string
-                                       (loop for tag-name in (str:split "," value
-                                                                        :omit-nulls t)
+                                       (loop for tag-name in (comma-split value)
                                              collect (make-instance 'tag
-                                                                    :name (str:trim tag-name))))))))
+                                                                    :name tag-name)))))))
          (result (apply #'call-next-method obj normalized-args))
          (all-initargs
            (loop for slot in (class-slots (class-of obj))
@@ -310,8 +328,8 @@
       (staticl/theme:render theme template-name vars stream))))
 
 
-(defgeneric preprocess (site plugin content-objects)
-  (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
+;; (defgeneric preprocess (site plugin content-objects)
+;;   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
 (defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
@@ -392,7 +410,7 @@
                 (content-tags content)))
   
   (if (next-method-p)
-      (call-next-method content :hash hash)
+      (call-next-method site content :hash hash)
       (values hash)))
 
 

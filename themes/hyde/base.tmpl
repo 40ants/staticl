@@ -11,13 +11,13 @@
     <link href="//fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css" />
     <link href= "/css/style.css" rel="stylesheet" type="text/css" />
     <link rel="alternate" href="/rss.xml" type="application/rss+xml" />
-    {if $injections.head}
-      {foreach $injection in $injections.head}
+    {if $content.injections.head}
+      {foreach $injection in $content.injections.head}
         {$injection |noAutoescape}
       {/foreach}
     {/if}
   </head>
-  <body>
+  <body class="staticl-page">
     <div class="navigation">
       <a href="/">{$site.title}</a> |
       {foreach $link in $site.navigation.items}
@@ -25,14 +25,23 @@
         {if not isLast($link)} {sp}|{sp} {/if}
       {/foreach}
     </div>
-    <div id="content">
-      {$raw |noAutoescape}
-    </div>
-    {if $injections.body}
-      {foreach $injection in $injections.body}
+    
+    {if $content.injections.before_content}
+      {foreach $injection in $content.injections.before_content}
         {$injection |noAutoescape}
       {/foreach}
     {/if}
+    
+    <div id="content">
+      {$raw |noAutoescape}
+    </div>
+    
+    {if $content.injections.after_content}
+      {foreach $injection in $content.injections.after_content}
+        {$injection |noAutoescape}
+      {/foreach}
+    {/if}
+    
     <div class="fineprint">
       <hr>
       <div class="fineprint-items">

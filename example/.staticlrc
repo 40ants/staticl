@@ -25,7 +25,9 @@
                               (rss :target-path #P"blog/rss.xml")
                               (atom :target-path #P"blog/atom.xml")
                               (tags-index :target-path "tags/"))
-                      (sitemap))
-      ;; :theme "readable"
-      :theme "hyde"
+                      (mathjax)
+                      (sitemap)
+                      (disqus "staticl-example"))
+      :theme "readable"
+      ;; :theme "hyde"
       )

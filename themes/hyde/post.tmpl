@@ -17,11 +17,11 @@
     {/if}
   </div>{\n}
 </div>{\n}
-<div class="article-content">{\n}
+<div class="content">{\n}
   {$content.html |noAutoescape}
 </div>{\n}
 <div class="relative-nav">{\n}
-  {if $content.prev} <a href="{$content.prev.url}">Previous</a><br> {/if}{\n}
-  {if $content.next} <a href="{$content.next.url}">Next</a><br> {/if}{\n}
+  {if $content.prev} <a href="{$content.prev.url}" title="{$content.prev.title}">Previous</a><br> {/if}{\n}
+  {if $content.next} <a href="{$content.next.url}" title="{$content.next.title}">Next</a><br> {/if}{\n}
 </div>{\n}
 {/template}

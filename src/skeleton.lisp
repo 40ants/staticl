@@ -11,7 +11,7 @@
   (:import-from #:mystic.template.file
                 #:file)
   (:export
-   #:create-site))
+   #:new-site))
 (in-package #:staticl/skeleton)
 
 
@@ -43,20 +43,24 @@
                           :content (alexandria:read-file-into-string filename))))
 
 
-(-> create-site ((or pathname string) string string &key (:description string))
-    (values &optional))
+(-> new-site ((or pathname string) string string &key (:description string))
+    (values pathname &optional))
 
-(defun create-site (path title url &key (description ""))
+(defun new-site (path title url &key (description ""))
   "Creates a new site skeleton with a few posts."
-  (let ((files (read-all-files
-                (asdf:system-relative-pathname :staticl
-                                               (make-pathname
-                                                :directory '(:relative "skeleton"))))))
+  (let ((files
+          (read-all-files
+           (asdf:system-relative-pathname :staticl
+                                          (make-pathname
+                                           :directory '(:relative "skeleton")))))
+        (full-output-dir
+          (uiop:merge-pathnames*
+           (uiop:ensure-directory-pathname path))))
     (mystic:render
      (make-instance 'staticl-site
                     :files files)
      (list :title title
            :url url
            :description description)
-     (uiop:merge-pathnames*
-      (uiop:ensure-directory-pathname path)))))
+     full-output-dir)
+    (values full-output-dir)))

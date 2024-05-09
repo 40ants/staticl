@@ -75,7 +75,7 @@
           :reader site-theme
           :documentation "A theme object for the site.")
    (pipeline :initarg :pipeline
-             ;; :type (soft-list-of plugin)
+             :type list
              :reader site-pipeline
              :documentation "A list of pipline nodes"))
   (:default-initargs
@@ -90,7 +90,13 @@
 
 (defun site (title &rest args)
   (when (getf args :url)
-    (assert-absolute-url (getf args :url)))
+    (assert-absolute-url (getf args :url))
+
+    ;; We need URL end with a backslash to
+    ;; make URL generation for pages work correctly:
+    (setf (getf args :url)
+          (str:ensure-suffix "/" (getf args :url))))
+  
   
   (apply #'make-instance 'site
          :title title
