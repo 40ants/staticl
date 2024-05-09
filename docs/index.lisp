@@ -29,6 +29,8 @@
                 #:@roadmap)
   (:import-from #:staticl-docs/contribution
                 #:@contribution)
+  (:import-from #:staticl-docs/sites
+                #:@sites)
   (:export #:@index
            #:@readme
            #:@changelog))
@@ -51,6 +53,7 @@
       "40A"
       "API"
       "JS"
+      "PR"
       "CSS"
       "UTF-8"
       "RSS"
@@ -112,6 +115,7 @@
   (@installation section)
   (@introduction section)
   (@roadmap section)
+  (@sites section)
   (@contribution section))
 
 
