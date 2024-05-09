@@ -25,6 +25,10 @@
                 #:@making-a-site)
   (:import-from #:staticl-docs/pipeline
                 #:@pipeline)
+  (:import-from #:staticl-docs/roadmap
+                #:@roadmap)
+  (:import-from #:staticl-docs/contribution
+                #:@contribution)
   (:export #:@index
            #:@readme
            #:@changelog))
@@ -106,7 +110,9 @@
 "
   
   (@installation section)
-  (@introduction section))
+  (@introduction section)
+  (@roadmap section)
+  (@contribution section))
 
 
 (defsection-copy @readme @index)
@@ -114,12 +120,18 @@
 
 (defsection @installation (:title "Installation")
   """
-You can install this library from Quicklisp, but you want to receive updates quickly, then install it from Ultralisp.org:
+This library is not in Quicklisp yet, but you can install it from Ultralisp.org:
 
 ```
 (ql-dist:install-dist "http://dist.ultralisp.org/"
                       :prompt nil)
 (ql:quickload :staticl)
+```
+
+Or, if you wish to use a command line utility, then install it with [Roswell](https://github.com/roswell/roswell) like this:
+
+```
+ros install 40ants/staticl
 ```
 """)
 
