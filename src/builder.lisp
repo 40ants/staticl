@@ -7,8 +7,7 @@
                 #:make-site)
   (:import-from #:staticl/content
                 #:write-content
-                #:read-contents
-                #:preprocess)
+                #:read-contents)
   (:import-from #:serapeum
                 #:->)
   (:import-from #:staticl/theme
@@ -18,7 +17,9 @@
   (:import-from #:staticl/current-root
                 #:with-current-root)
   (:import-from #:staticl/url
-                #:with-base-url))
+                #:with-base-url)
+  (:export
+   #:generate))
 (in-package #:staticl/builder)
 
 

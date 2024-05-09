@@ -3,6 +3,7 @@
   (:import-from #:log)
   (:import-from #:quri)
   (:import-from #:str
+                #:trim
                 #:trim-left)
   (:import-from #:serapeum
                 #:maphash-new
@@ -13,6 +14,10 @@
                 #:with-gensyms)
   (:import-from #:cl-fad
                 #:walk-directory)
+  (:import-from #:closer-mop
+                #:class-direct-slots)
+  (:import-from #:40ants-doc/docstring
+                #:strip-docstring-indentation)
   (:export
    #:do-files
    #:normalize-plist
@@ -180,3 +185,26 @@ BODY on files that match the given extension."
       (error "There is no host in ~S."
              url))
     url))
+
+
+(-> comma-split (string)
+    (values (serapeum:soft-list-of string)
+            &optional))
+
+(defun comma-split (text)
+  (mapcar #'trim
+          (str:split ","
+                     text
+                     :omit-nulls t)))
+
+
+(-> slot-documentation (symbol symbol)
+    (values (or null string)
+            &optional))
+
+(defun slot-documentation (class-name slot-name)
+  (loop for slot in (class-direct-slots (find-class class-name))
+        when (eql (closer-mop:slot-definition-name slot)
+                  slot-name)
+        do (return (strip-docstring-indentation
+                    (documentation slot t)))))

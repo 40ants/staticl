@@ -12,6 +12,8 @@
                 #:fmt)
   (:import-from #:staticl/content/post
                 #:postp)
+  (:import-from #:staticl/utils
+                #:slot-documentation)
   (:export #:paginated-index
            #:page-filename-fn
            #:page-title-fn))
@@ -51,7 +53,7 @@
                      :documentation "A callback to change page titles.
 
                                      Accepts single argument - a page number and should return a pathname relative to the site's root.
-                                     By default, it returns index.html for the first page and page-2.html, page-3.html for others.
+                                     By default, it returns `index.html` for the first page and `page-2.html`, `page-3.html` for others.
 
                                      If site has \"clean urls\" setting enabled, then additional transformation to the pathname will be
                                      applied automatically."
@@ -82,6 +84,31 @@
          initargs))
 
 
+(let ((docs
+        (fmt "
+Creates additional HTML files with post's excerpts grouped by PAGE-SIZE items.
+
+By default `index.html`, `page-2.html`, `page-3.html`, etc. filenames are used, but this
+can be overriden by PAGE-FILENAME-FN argument.
+
+The same way page title may be overriden by providing a function as PAGE-TITLE-FN argument.
+
+# Arguments:
+
+**PAGE-FILENAME-FN**:
+
+~A
+
+**PAGE-TITLE-FN**:
+
+~A
+"
+             (slot-documentation 'paginated-index 'page-filename-fn)
+             (slot-documentation 'paginated-index 'page-title-fn))))
+  (setf (documentation 'paginated-index 'function)
+        docs))
+
+
 (defmethod staticl/pipeline:process-items ((site site) (index paginated-index) content-items)
   (loop with only-posts = (remove-if-not #'postp content-items)
         with sorted-posts = (sort only-posts
@@ -101,9 +128,9 @@
                                :items batch) into pages
         finally (loop for (prev page next) on (list* nil pages)
                       when page
-                        do (setf (staticl/index/base:prev-page page)
-                                 prev
-                                 (staticl/index/base:prev-page page)
-                                 next)
-                           (staticl/pipeline:produce-item page)))
+                      do (setf (staticl/index/base:prev-page page)
+                               prev
+                               (staticl/index/base:prev-page page)
+                               next)
+                         (staticl/pipeline:produce-item page)))
   (values))

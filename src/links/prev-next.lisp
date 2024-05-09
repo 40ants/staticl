@@ -19,7 +19,10 @@
 
 
 (defun prev-next-links ()
-  "Creates a links between pages."
+  "Creates a links between pages.
+
+   Links are added to the content item's metadata and available in templates as
+   `content.prev.url` and `content.next.url` variables."
   (make-instance 'prev-next-links))
 
 

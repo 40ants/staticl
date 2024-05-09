@@ -10,7 +10,11 @@
   (:import-from #:staticl/content
                 #:has-tag-p)
   (:import-from #:serapeum
-                #:->))
+                #:->)
+  (:export
+   #:mathjax
+   #:force-mathjax-p
+   #:math-tag-name))
 (in-package #:staticl/plugins/mathjax)
 
 
@@ -54,7 +58,7 @@ MathJax = {
     (values mathjax &optional))
 
 (defun mathjax (&key force (tag-name "math"))
-  "Enables MathJAX on the page if it's content has tag equal to the TAG-NAME or if FORCE argument was given."
+  "Enables `MathJAX` on the page if it's content has tag equal to the TAG-NAME or if FORCE argument was given."
   (make-instance 'mathjax
                  :force force
                  :tag-name tag-name))

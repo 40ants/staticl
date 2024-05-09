@@ -11,7 +11,10 @@
                 #:has-tag-p)
   (:import-from #:serapeum
                 #:fmt
-                #:->))
+                #:->)
+  (:export
+   #:disqus
+   #:disqus-shortname))
 (in-package #:staticl/plugins/disqus)
 
 
@@ -46,7 +49,9 @@
     (values disqus &optional))
 
 (defun disqus (shortname)
-  "Enables Disqus on the page if it's content has tag equal to the TAG-NAME or if FORCE argument was given."
+  "Enables Disqus on the page.
+
+   To make it work, you have to register your site at Disqus and provide a short site name to the function."
   (make-instance 'disqus
                  :shortname shortname))
 

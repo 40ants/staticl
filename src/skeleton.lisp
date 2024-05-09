@@ -9,7 +9,9 @@
   (:import-from #:mystic.util
                 #:read-template-file)
   (:import-from #:mystic.template.file
-                #:file))
+                #:file)
+  (:export
+   #:new-site))
 (in-package #:staticl/skeleton)
 
 

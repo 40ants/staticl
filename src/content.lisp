@@ -16,6 +16,7 @@
                 #:with-output-to-file
                 #:length=)
   (:import-from #:staticl/utils
+                #:comma-split
                 #:normalize-plist
                 #:do-files)
   (:import-from #:staticl/content/reader
@@ -59,7 +60,7 @@
            #:content-class
            #:write-content-to-stream
            #:write-content
-           #:preprocess
+           ;; #:preprocess
            #:get-target-filename
            #:content-with-title-mixin
            #:content-with-tags-mixin
@@ -187,10 +188,9 @@
                                     (etypecase value
                                       (list value)
                                       (string
-                                       (loop for tag-name in (str:split "," value
-                                                                        :omit-nulls t)
+                                       (loop for tag-name in (comma-split value)
                                              collect (make-instance 'tag
-                                                                    :name (str:trim tag-name))))))))
+                                                                    :name tag-name)))))))
          (result (apply #'call-next-method obj normalized-args))
          (all-initargs
            (loop for slot in (class-slots (class-of obj))

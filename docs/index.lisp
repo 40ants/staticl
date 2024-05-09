@@ -21,6 +21,10 @@
                 #:eval-always)
   (:import-from #:40ants-doc/locatives/asdf-system
                 #:asdf-system-documentation-title)
+  (:import-from #:staticl-docs/making-a-static-site
+                #:@making-a-site)
+  (:import-from #:staticl-docs/pipeline
+                #:@pipeline)
   (:export #:@index
            #:@readme
            #:@changelog))
@@ -73,6 +77,8 @@
         (find-symbol "40ANTS-THEME"
                      (find-package "40ANTS-DOC-THEME-40ANTS"))
         :root-sections '(@index
+                         @making-a-site
+                         @pipeline
                          @api)))
 
 

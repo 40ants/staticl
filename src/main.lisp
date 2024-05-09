@@ -1,7 +1,6 @@
 (uiop:define-package #:staticl/main
   (:use #:cl)
-  (:import-from #:staticl/core
-                #:stage)
+  (:import-from #:staticl)
   (:import-from #:staticl/skeleton)
   (:import-from #:defmain
                 #:subcommand
@@ -44,8 +43,8 @@
               (namestring source-dir))
       (uiop:quit 1))
     
-    (stage :root-dir source-dir
-           :stage-dir output-dir)
+    (staticl:generate :root-dir source-dir
+                      :stage-dir output-dir)
     (when *verbose*
       (format t "Site was written to: ~A~%"
               (namestring output-dir)))))

@@ -13,6 +13,11 @@
    :feed-type 'org.shirakumo.feeder:rss))
 
 
-(defun rss (&key (target-path #P"rss.xml"))
+(defun rss (&key (target-path #P"rss.xml")
+                 (limit 10))
+  "Creates an XML feed in Rss format at TARGET-PATH.
+
+   Only a LIMIT latest posts are included into the feed."
   (make-instance 'rss
-                 :target-path (pathname target-path)))
+                 :target-path (pathname target-path)
+                 :length-limit limit))

@@ -33,3 +33,5 @@
                 #:paginated-index)
   (:import-from #:staticl/index/tags
                 #:tags-index))
+(in-package #:staticl-user)
+

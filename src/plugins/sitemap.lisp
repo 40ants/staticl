@@ -16,7 +16,9 @@
                 #:make-url
                 #:render-sitemap)
   (:import-from #:staticl/url
-                #:object-url))
+                #:object-url)
+  (:export
+   #:sitemap))
 (in-package #:staticl/plugins/sitemap)
 
 

@@ -26,7 +26,9 @@
                 #:lock
                 #:condition-variable)
   (:import-from #:staticl/plugins/autoreload
-                #:autoreload))
+                #:autoreload)
+  (:export
+   #:serve))
 (in-package #:staticl/server)
 
 (defvar *port* nil)
@@ -132,8 +134,8 @@
 
 
 (-> serve (&key
-           (:root-dir pathname)
-           (:stage-dir pathname)
+           (:root-dir (or pathname string))
+           (:stage-dir (or pathname string))
            (:in-thread t)
            (:port (or null integer))
            (:interface string))
@@ -145,20 +147,22 @@
                    (in-thread t)
                    port
                    (interface "localhost"))
-  (let ((root-dir
-          ;; Here we ensure both root and stage dirs are absolute and point to the directories
-          (merge-pathnames
-           (uiop:ensure-directory-pathname root-dir)))
-        (stage-dir
-          (merge-pathnames
-           (uiop:ensure-directory-pathname stage-dir)))
-        (dirs-to-watch
-          (list root-dir
-                ;; We also want to watch if staticl
-                ;; directory changes. This will make it
-                ;; easier to edit builtin themes.
-                (asdf:system-relative-pathname "staticl"
-                                               #P""))))
+  (let* ((root-dir
+           ;; Here we ensure both root and stage dirs are absolute and point to the directories
+           (merge-pathnames
+            (uiop:ensure-directory-pathname root-dir)))
+         (stage-dir
+           (merge-pathnames
+            (uiop:ensure-directory-pathname stage-dir)))
+         ;; It is important to ensure directories pathnames in this
+         ;; list. This is why we use LET*.
+         (dirs-to-watch
+           (list root-dir
+                 ;; We also want to watch if staticl
+                 ;; directory changes. This will make it
+                 ;; easier to edit builtin themes.
+                 (asdf:system-relative-pathname "staticl"
+                                                #P""))))
     
     (when *server*
       (log:debug "Stopping an old server")
@@ -208,6 +212,7 @@
                      (notify event)))
                 
                  (run-site-autobuilder ()
+                   (log:info "Watching on" dirs-to-watch)
                    (fs-watcher:watch dirs-to-watch #'build-site)))
           (cond
             (in-thread
