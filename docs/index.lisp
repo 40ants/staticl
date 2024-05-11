@@ -135,6 +135,9 @@ This library is not in Quicklisp yet, but you can install it from Ultralisp.org:
 Or, if you wish to use a command line utility, then install it with [Roswell](https://github.com/roswell/roswell) like this:
 
 ```
+ros run --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)' --quit
+ros install 40ants-asdf-system
+ros install spinneret
 ros install 40ants/staticl
 ```
 """)
