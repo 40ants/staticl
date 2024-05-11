@@ -42,8 +42,11 @@
 (eval-always
   (defparameter *ignore-words*
     '("JSON"
+      "YAML"
+      "OSX"
       "HTTP"
       "HTML"
+      "DSL"
       "TODO"
       "StatiCL"
       "Unlicense"
@@ -113,6 +116,8 @@
 "
   
   (@installation section)
+  (@rationale section)
+  (@features section)
   (@introduction section)
   (@roadmap section)
   (@sites section)
@@ -135,39 +140,38 @@ This library is not in Quicklisp yet, but you can install it from Ultralisp.org:
 Or, if you wish to use a command line utility, then install it with [Roswell](https://github.com/roswell/roswell) like this:
 
 ```
+ros run --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)' --quit
+ros install 40ants-asdf-system
+ros install spinneret
 ros install 40ants/staticl
 ```
 """)
 
 
-;; (defsection @usage (:title "Usage")
-;;   "
-;; `StatiCL` is a static site generator. `StatiCL` as a modular architecture and is suitable for any kind of a site
-;; be it a blog or a site with pages not included in the feeds. This project was created to overcome limitations of the Coleslaw.
-;; ")
+(defsection @rationale (:title "Rationale")
+  "
+Why was another static website generator made when the world is already full of them? There are only three reasons.
+
+The first reason is that at 40Ants we prefer to use Common Lisp in our projects, because it is a significant lever and increases the efficiency of the developer. But the choice of static generators of sites written in Common Lisp is not so great. We know of only one such project – Coleslaw. Actually, we used it, but it turned out that it was not flexible enough.
+
+And here we come to reason number two – Coleslaw was originally conceived as a static blog generator and only later it became possible to add arbitrary pages. So its whole architecture revolves around posts and indexes. We wanted something more. For example, the ability to make static landing pages with arbitrary placement of blocks, and remove blog posts in a separate subsection. And also, we really wanted to run a multilingual blog where posts in different languages could be in different folders. And so on.
+
+Of course, we could look at static site generators in other programming languages, for example Hugo or Nikola. But most of them use simple linear configs or awful YAML files, whereas with Lisp we have more extensive site configuration options due to the fact that all the features of the programming language are available to us. The ability to use DSL (Domain Specific Language) for greater expressiveness of site configuration is the third reason why it was decided to make `StatiCL`.
+")
 
 
-;; (defsection @idea (:title "Idea behind the StatiCL")
-;;   "
-;; Whereas `Coleslaw` has a monilite architecture, `StatiCL` introduces a modular way of building a pipeline for re
-;; ")
+(defsection @features (:title "Features")
+  "
+* Hackable. `StaticCL` probably the most hackable static site builder in the World due to the nature of Common Lisp programming language and it's interactive development approach.
+* Suitable for a site of any configuration, not only for a blog.
+* Multiplatform. This project is already tested on Linix and OSX.
+* Supports different themes.
+* Multiple templating engines might be used.
+* Many content formats are supported. Markdown is used by default, but you can easily use reStructured text, Spinneret or add your own.
+* Plugins and themse can be hosted along with the content of your site.
 
-
-;; (defsection @processing-pipeline (:title "Processing Pipeline")
-;;   "
-;; First of all, a STATICL/SITE:SITE object is created and filled with options from `.staticlrc` file.
-
-;; Then STATICL:STAGE function calls STATICL/CONTENT:READ-CONTENT generic-function which returns a list
-;; of STATICL/CONTENT:CONTENT objects. On the next stage, initial list of content objects are passed to a
-;; generic-function STATICL/CONTENT:PREPROCESS called with a preprocessor returned by a
-;; generic-function STATICL/PLUGINS:SITE-PLUGINS as a first argument. Each preprocessor may
-;; return additional STATICL/CONTENT:CONTENT objects such as index pages, RSS or ATOM feeds, sitemaps etc.
-
-;; When all content was preprocessed, a generic-function STATICL/CONTENT:WRITE-CONTENT is called
-;; on each STATICL/CONTENT:CONTENT object and a SITE object. Content objects are having a format slot,
-;; so internally STATICL/CONTENT:WRITE-CONTENT generic-function creates an object of corresponding format class
-;; or takes it from the cache and then calls STATICL/CONTENT:WRITE-CONTENT-TO-STREAM using this format object.
-;; ")
+See also the STATICL-DOCS/ROADMAP::@ROADMAP section.
+")
 
 
 (defautodoc @api (:system "staticl"
