@@ -194,7 +194,11 @@
              (url (format nil "http://~A:~A/"
                           interface port)))
         (setf *port* port)
-        (open-browser url)
+
+        ;; On some systems might not be a command-line
+        ;; utility for opening the URL:
+        (ignore-errors
+         (open-browser url))
        
         (labels ((build-site (changed-file)
                    (unless (in-subdir-p real-stage-dir changed-file)
