@@ -44,6 +44,8 @@
     ;; as "date" rule:
     (define-print-syntax print-datetime "datetime" (:constant t))
     (define-print-syntax print-date "date" (:constant t))
+    (define-print-syntax remove-html-tags "remove-html-tags" (:constant t))
+    (define-print-syntax first-line "first-line" (:constant t))
     
     (flet ((format-date (params end value)
              (declare (ignore params end))
@@ -54,13 +56,33 @@
              (declare (ignore params end))
              (when value
                (format-timestring nil value
-                                  :format (datetime-format theme)))))
+                                  :format (datetime-format theme))))
+           (remove-html-tags (params end value)
+             (declare (ignore params end))
+             (when value
+               (html2text:html2text value
+                                    :tags-to-remove (list :img
+                                                          :style
+                                                          :script))))
+           (first-line (params end value)
+             (declare (ignore params end))
+             (when value
+               (first
+                (str:split #\Newline value
+                           :omit-nulls t
+                           :limit 2)))))
       (register-print-handler :common-lisp-backend
                               'print-date
                               :function #'format-date)
       (register-print-handler :common-lisp-backend
                               'print-datetime
-                              :function #'format-datetime))))
+                              :function #'format-datetime)
+      (register-print-handler :common-lisp-backend
+                              'remove-html-tags
+                              :function #'remove-html-tags)
+      (register-print-handler :common-lisp-backend
+                              'first-line
+                              :function #'first-line))))
 
 (defmethod initialize-instance :after ((obj closure-template) &rest initargs &key path &allow-other-keys)
   (declare (ignore initargs))

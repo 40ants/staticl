@@ -50,7 +50,7 @@
           :type string
           :reader site-title
           :documentation "Site's title.")
-   (description :initarg :title
+   (description :initarg :description
                 :type string
                 :reader site-description
                 :documentation "Site's description.")
