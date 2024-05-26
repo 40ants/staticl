@@ -359,7 +359,6 @@
            (content-format content)))
 
 
-
 (defmethod content-html-excerpt ((content content-from-file))
   (let* ((separator (content-excerpt-separator content))
          (full-content (content-text content))
@@ -381,6 +380,8 @@
         (content-title content)
         (gethash "html" hash)
         (content-html content)
+        (gethash "excerpt" hash)
+        (content-html-excerpt content)
         (gethash "created-at" hash)
         (content-created-at content)
         

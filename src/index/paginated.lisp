@@ -93,7 +93,7 @@ can be overriden by PAGE-FILENAME-FN argument.
 
 The same way page title may be overriden by providing a function as PAGE-TITLE-FN argument.
 
-# Arguments:
+**Arguments:**
 
 **PAGE-FILENAME-FN**:
 

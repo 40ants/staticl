@@ -42,7 +42,7 @@
           appending (parse-initarg line))))
 
 
-(-> read-content (pathname &key (:separator string))
+(-> read-content-file (pathname &key (:separator string))
     (values proper-list &optional))
 
 (defun read-content-file (file &key (separator *default-metadata-separator*))
