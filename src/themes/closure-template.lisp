@@ -12,7 +12,9 @@
   (:import-from #:str
                 #:replace-all)
   (:import-from #:local-time
-                #:format-timestring))
+                #:format-timestring)
+  (:import-from #:html2text
+                #:html2text))
 (in-package #:staticl/themes/closure-template)
 
 
@@ -60,10 +62,10 @@
            (remove-html-tags (params end value)
              (declare (ignore params end))
              (when value
-               (html2text:html2text value
-                                    :tags-to-remove (list :img
-                                                          :style
-                                                          :script))))
+               (html2text value
+                          :tags-to-remove (list :img
+                                                :style
+                                                :script))))
            (first-line (params end value)
              (declare (ignore params end))
              (when value
