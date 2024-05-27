@@ -9,6 +9,8 @@
                               "ASDF"
                               "REPL"
                               "HTTP"))
+  (0.3.0 2024-05-27
+         "* Field `url` was added to `content` objects of type `post` and `page`. It contains a full URL of the page and can be used as `canonical` URL in templates.")
   (0.2.0 2024-05-26
          "* `Excerpt` field was added to the `content` objects such as posts and pages. It can be used in the description HTML tags.
           * Filters `remove-html-tags` and `first-line` were added to the template engine base on Closure Templates.")

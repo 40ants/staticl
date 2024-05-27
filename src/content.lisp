@@ -378,6 +378,8 @@
 (defmethod template-vars ((site site) (content content-from-file) &key (hash (dict)))
   (setf (gethash "title" hash)
         (content-title content)
+        (gethash "url" hash)
+        (object-url site content :full t)
         (gethash "html" hash)
         (content-html content)
         (gethash "excerpt" hash)
