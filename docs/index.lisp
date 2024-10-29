@@ -168,7 +168,7 @@ Of course, we could look at static site generators in other programming language
 * Supports different themes.
 * Multiple templating engines might be used.
 * Many content formats are supported. Markdown is used by default, but you can easily use reStructured text, Spinneret or add your own.
-* Plugins and themse can be hosted along with the content of your site.
+* Plugins and themes can be hosted along with the content of your site.
 
 See also the STATICL-DOCS/ROADMAP::@ROADMAP section.
 ")

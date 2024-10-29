@@ -9,6 +9,9 @@
                               "ASDF"
                               "REPL"
                               "HTTP"))
+  (0.3.1 2024-10-29
+         "* `stop` function was exported.
+          * A typo was fixed in the documentation.")
   (0.3.0 2024-05-27
          "* Field `url` was added to `content` objects of type `post` and `page`. It contains a full URL of the page and can be used as `canonical` URL in templates.")
   (0.2.0 2024-05-26

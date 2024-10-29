@@ -28,7 +28,8 @@
   (:import-from #:staticl/plugins/autoreload
                 #:autoreload)
   (:export
-   #:serve))
+   #:serve
+   #:stop))
 (in-package #:staticl/server)
 
 (defvar *port* nil)
