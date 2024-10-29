@@ -154,13 +154,7 @@ CL-USER> (staticl:serve :root-dir #P"/tmp/my-site"
   Starting Clack server to serve site from /tmp/result/
 Hunchentoot server is started.
 Listening on localhost:8001.
-#S(CLACK.HANDLER::HANDLER
-   :SERVER :HUNCHENTOOT
-   :SWANK-PORT NIL
-   :ACCEPTOR #<BT2:THREAD "clack-handler-hunchentoot" {100480FF43}>)
 ```
-
-It will return a web server handler.
 
 Or from the command line:
 
