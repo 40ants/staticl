@@ -154,7 +154,13 @@ CL-USER> (staticl:serve :root-dir #P"/tmp/my-site"
   Starting Clack server to serve site from /tmp/result/
 Hunchentoot server is started.
 Listening on localhost:8001.
+#S(CLACK.HANDLER::HANDLER
+   :SERVER :HUNCHENTOOT
+   :SWANK-PORT NIL
+   :ACCEPTOR #<BT2:THREAD "clack-handler-hunchentoot" {100480FF43}>)
 ```
+
+It will return a web server handler.
 
 Or from the command line:
 
@@ -181,6 +187,13 @@ If you click on one of the posts, it will open in its entirety:
 ![Image](https://storage.yandexcloud.net/40ants-public/staticl/docs/tutorial/second-post.webp)
 
 Pay attention to the "Next" link in the lower right corner. All blog posts are linked to each other and this is also done thanks to a separate pipeline block: `(prev-next-links)'. This pipeline block adds metadata to each post, which is then available in the template. If you remove it, the links will disappear from the pages.
+
+To stop your server, use the following command in REPL:
+
+```lisp
+CL-USER> (staticl:stop)
+; No values
+```
 
 ## How to add comments using Disqus
 

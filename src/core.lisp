@@ -6,10 +6,12 @@
   (:import-from #:staticl/builder
                 #:generate)
   (:import-from #:staticl/server
-                #:serve)
+                #:serve
+                #:stop)
   (:export #:generate
            #:new-site
-           #:serve))
+           #:serve
+           #:stop))
 (in-package #:staticl)
 
 
