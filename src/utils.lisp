@@ -22,7 +22,8 @@
    #:do-files
    #:normalize-plist
    #:absolute-url-p
-   #:assert-absolute-url))
+   #:assert-absolute-url
+   #:make-absolute-url))
 (in-package #:staticl/utils)
 
 
@@ -171,6 +172,19 @@ BODY on files that match the given extension."
     (when (and (quri:uri-scheme parsed)
                (quri:uri-host parsed))
       (values t))))
+
+
+(-> make-absolute-url (string string)
+    (values string &optional))
+
+(defun make-absolute-url (url base-url)
+  (cond
+    ((absolute-url-p url)
+     url)
+    (t
+     (quri:render-uri
+      (quri:merge-uris url
+                       base-url)))))
 
 
 (-> assert-absolute-url (string)

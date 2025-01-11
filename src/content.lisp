@@ -373,7 +373,7 @@
         finally (return result)))
 
 
-(defmethod content-html ((site site) (content content-from-file) (relative-to-content content))
+(defmethod content-html ((site site) (content content-from-file) (relative-to-content content) &key absolute-urls)
   (let* ((content-filename
            (get-target-filename site
                                 content
@@ -394,10 +394,17 @@
     (to-html (content-text content)
              (content-format content)
              content-filename
-             relative-to-content-filename)))
+             relative-to-content-filename
+             :absolute-urls absolute-urls
+             :content-url (object-url site content
+                                      :full t
+                                      ;; We need to turn off clean urls here,
+                                      ;; otherwise urls to media files will be
+                                      ;; calculated incorrectly:
+                                      :clean-urls nil))))
 
 
-(defmethod content-html-excerpt ((site site) (content content-from-file) (relative-to-content content))
+(defmethod content-html-excerpt ((site site) (content content-from-file) (relative-to-content content) &key absolute-urls)
   (let* ((separator (content-excerpt-separator content))
          (full-content (content-text content))
          (excerpt (first
@@ -424,7 +431,14 @@
     (to-html excerpt
              (content-format content)
              content-filename
-             relative-to-content-filename)))
+             relative-to-content-filename
+             :absolute-urls absolute-urls
+             :content-url (object-url site content
+                                      :full t
+                                      ;; We need to turn off clean urls here,
+                                      ;; otherwise urls to media files will be
+                                      ;; calculated incorrectly:
+                                      :clean-urls nil))))
 
 
 (defmethod has-more-content-p ((content content-from-file))

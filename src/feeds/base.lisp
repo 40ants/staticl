@@ -81,8 +81,13 @@
                                         :summary (staticl/content/html-content:content-html-excerpt
                                                   site
                                                   item
-                                                  feed-file)
-                                        :content (staticl/content::content-html site item feed-file))
+                                                  feed-file
+                                                  :absolute-urls t                                                  :absolute-urls t)
+                                        :content (staticl/content::content-html
+                                                  site
+                                                  item
+                                                  feed-file
+                                                  :absolute-urls t))
         collect feed-entry into entries
         finally
            (let* ((feed (make-instance 'org.shirakumo.feeder:feed
