@@ -88,7 +88,9 @@
    :charset "UTF-8"))
 
 
-(defun site (title &rest args)
+(defun site (title &rest args &key description navigation chatset url clean-urls theme pipeline)
+  (declare (ignore description navigation chatset url clean-urls theme pipeline))
+  
   (when (getf args :url)
     (assert-absolute-url (getf args :url))
 
