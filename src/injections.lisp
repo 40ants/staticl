@@ -34,10 +34,10 @@
     (values)))
 
 
-(defmethod template-vars ((site site) (content content-with-injections-mixin) &key (hash (dict)))
+(defmethod template-vars ((site site) (content content-with-injections-mixin) (stage-dir pathname) &key (hash (dict)))
   (setf (gethash "injections" hash)
         (content-injections content))
   
   (if (next-method-p)
-      (call-next-method site content :hash hash)
+      (call-next-method site content stage-dir :hash hash)
       (values hash)))

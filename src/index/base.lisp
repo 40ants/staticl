@@ -56,6 +56,13 @@
    :template *default-template*))
 
 
+(defmethod shared-initialize ((instance base-index) slot-names &rest initargs &key &allow-other-keys)
+  (when (getf initargs :target-path)
+    (setf (getf initargs :target-path)
+          (pathname (getf initargs :target-path))))
+  (apply #'call-next-method instance slot-names initargs))
+
+
 (defclass index-page (content-with-injections-mixin content)
   ((target-path :initarg :target-path
                 :type pathname
@@ -86,13 +93,14 @@
    :template *default-template*))
 
 
-(defmethod get-target-filename ((site site) (page index-page) stage-dir)
+(defmethod get-target-filename ((site site) (page index-page) stage-dir &key make-clean-if-needed)
+  (declare (ignore make-clean-if-needed))
   (merge-pathnames (page-target-path page)
                    stage-dir))
 
 
 
-(defmethod template-vars ((site site) (content index-page) &key (hash (dict)))
+(defmethod template-vars ((site site) (content index-page) (stage-dir pathname) &key (hash (dict)))
   (flet ((item-vars (item)
            (dict "url"
                  (staticl/url:object-url site item)
@@ -101,7 +109,11 @@
                  "created-at"
                  (staticl/content:content-created-at item)
                  "excerpt"
-                 (staticl/content/html-content:content-html-excerpt item)
+                 (staticl/content/html-content:content-html-excerpt
+                  site
+                  item
+                  content
+                  stage-dir)
                  "has-more"
                  (staticl/content/html-content:has-more-content-p item))))
     (declare (dynamic-extent #'item-vars))
@@ -122,7 +134,7 @@
              (staticl/url:object-url site (next-page content))))))
   
   (if (next-method-p)
-      (call-next-method site content :hash hash)
+      (call-next-method site content stage-dir :hash hash)
       (values hash)))
 
 

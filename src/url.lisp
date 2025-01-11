@@ -24,7 +24,7 @@
 
 (defgeneric object-url (site obj &key full)
   (:documentation "Returns a full object URL.
-                   A method should return an relative URL, but if case if FULL argument was given,
+                   A method should return an relative URL, but in case if FULL argument was given,
                    the full url with schema and domain will be returned.
 
                    Note a call to this method should happen in a context of the WITH-BASE-URL macro,

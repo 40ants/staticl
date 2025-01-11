@@ -1,6 +1,7 @@
 (uiop:define-package #:staticl/content
   (:use #:cl)
   (:import-from #:serapeum
+                #:absolute-pathname
                 #:->
                 #:dict)
   (:import-from #:org.shirakumo.fuzzy-dates)
@@ -39,6 +40,7 @@
                 #:tag-name
                 #:tag)
   (:import-from #:staticl/format
+                #:extract-assets
                 #:to-html)
   (:import-from #:staticl/url
                 #:object-url)
@@ -76,7 +78,8 @@
            #:content-tags
            #:content-metadata
            #:content-file-type
-           #:has-tag-p))
+           #:has-tag-p
+           #:content-assets))
 (in-package #:staticl/content)
 
 
@@ -151,7 +154,7 @@
                :type timestamp
                :reader content-created-at)
    (file :initarg :file
-         :type pathname
+         :type absolute-pathname
          :reader content-file
          :documentation "Absolute pathname to the file read from disk or NIL for content objects which have no source file, like RSS feeds.")
    (url :initarg :url
@@ -245,6 +248,13 @@
       (t (constantly nil)))))
 
 
+(defgeneric content-assets (content)
+  (:documentation "This generic-function is called for every content item found on disk and can return a list
+                   of additional content items such as images or files mentioned in the CONTENT argument.")
+  (:method ((content t))
+    (values nil)))
+
+
 (defgeneric read-content-from-disk (site content-type &key exclude)
   (:documentation "Returns a list of CONTENT objects corresponding to a given content type.
 
@@ -261,8 +271,11 @@
                              relative-pathname)
               (let* ((args (read-content-file file))
                      (obj (apply #'make-instance (content-class content-type)
-                                 args)))
-                (collect obj)))))))))
+                                 args))
+                     (assets (content-assets obj)))
+                (collect obj)
+                (loop for item in assets
+                      do (collect item))))))))))
 
 
 (defgeneric read-contents (site &key exclude)
@@ -284,14 +297,16 @@
       (ensure-directories-exist target-filename)
       
       (with-output-to-file (stream target-filename :if-exists :supersede)
-        (write-content-to-stream site content stream))
+        (write-content-to-stream site content stream stage-dir))
       (values))))
 
 
-(defgeneric get-target-filename (site content stage-dir)
+(defgeneric get-target-filename (site content stage-dir &key make-clean-if-needed)
   (:documentation "Should return an absolute pathname to a file where this content item should be rendered.")
 
-  (:method ((site site) (content content) (stage-dir pathname))
+  (:method ((site site) (content content) (stage-dir pathname) &key make-clean-if-needed)
+    (declare (ignore make-clean-if-needed))
+    
     (let ((relative-path (enough-namestring (content-file content)
                                             (site-content-root site))))
       (merge-pathnames
@@ -299,9 +314,13 @@
                         relative-path)
        stage-dir)))
   
-  (:method :around ((site site) (content content) (stage-dir pathname))
-    (transform-filename site
-                        (call-next-method))))
+  (:method :around ((site site) (content content) (stage-dir pathname) &key (make-clean-if-needed t))
+    (cond
+      (make-clean-if-needed
+       (transform-filename site
+                           (call-next-method)))
+      (t
+       (call-next-method)))))
 
 
 (defmethod object-url ((site site) (content content-from-file) &key &allow-other-keys)
@@ -314,13 +333,13 @@
                           relative-path)))))
 
 
-(defgeneric write-content-to-stream (site content stream)
+(defgeneric write-content-to-stream (site content stream stage-dir)
   (:documentation "Writes CONTENT object to the STREAM using given FORMAT.")
 
-  (:method ((site site) (content content) (stream stream))
+  (:method ((site site) (content content) (stream stream) (stage-dir pathname))
     (let* ((theme (site-theme site))
-           (content-vars (template-vars site content))
-           (site-vars (template-vars site site))
+           (content-vars (template-vars site content stage-dir))
+           (site-vars (template-vars site site stage-dir))
            (vars (dict "site" site-vars
                        "content" content-vars))
            (template-name (content-template content)))
@@ -332,9 +351,9 @@
 ;;   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
-(defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
+(defmethod template-vars :around ((site site) (content content) (stage-dir pathname) &key (hash (dict)))
   (loop with result = (if (next-method-p)
-                          (call-next-method site content :hash hash)
+                          (call-next-method site content stage-dir :hash hash)
                           (values hash))
         for key being the hash-key of (content-metadata content)
           using (hash-value value)
@@ -347,27 +366,52 @@
                    ;; Here we need transform CLOS objects to hash-tables
                    ;; to make their fields accessable in the template
                    (standard-object
-                    (template-vars site value))
+                    (template-vars site value stage-dir))
                    ;; Other types are passed as is:
                    (t
                     value)))
         finally (return result)))
 
 
-(defmethod content-html ((content content-from-file))
-  (to-html (content-text content)
-           (content-format content)))
+(defmethod content-html ((site site) (content content-from-file) (relative-to-content content) (stage-dir pathname))
+  (let* ((content-filename
+           (get-target-filename site content stage-dir
+                                ;; Here we turn off clean urls,
+                                ;; because we need to get absolute
+                                ;; path to any content assets
+                                ;; on a real filesystem, not in terms of URLs.
+                                :make-clean-if-needed nil))
+         (relative-to-content-filename
+           (get-target-filename site relative-to-content stage-dir
+                                :make-clean-if-needed t)))
+    (to-html (content-text content)
+             (content-format content)
+             content-filename
+             relative-to-content-filename)))
 
 
-(defmethod content-html-excerpt ((content content-from-file))
+(defmethod content-html-excerpt ((site site) (content content-from-file) (relative-to-content content) (stage-dir pathname))
   (let* ((separator (content-excerpt-separator content))
          (full-content (content-text content))
          (excerpt (first
                    (str:split separator
                               full-content
-                              :limit 2))))
+                              :limit 2)))
+         (content-filename
+           (get-target-filename site content stage-dir
+                                ;; Here we turn off clean urls,
+                                ;; because we need to get absolute
+                                ;; path to any content assets
+                                ;; on a real filesystem, not in terms of URLs.
+                                :make-clean-if-needed nil))
+         (relative-to-content-filename
+           (get-target-filename site relative-to-content stage-dir
+                                :make-clean-if-needed t)))
     (to-html excerpt
-             (content-format content))))
+             (content-format content)
+             content-filename
+             relative-to-content-filename)))
+
 
 (defmethod has-more-content-p ((content content-from-file))
   (let* ((separator (content-excerpt-separator content))
@@ -375,15 +419,21 @@
     (str:containsp separator full-content)))
 
 
-(defmethod template-vars ((site site) (content content-from-file) &key (hash (dict)))
+(defmethod content-assets ((content content-from-file))
+  (extract-assets (content-text content)
+                  (content-format content)
+                  (content-file content)))
+
+
+(defmethod template-vars ((site site) (content content-from-file) (stage-dir pathname) &key (hash (dict)))
   (setf (gethash "title" hash)
         (content-title content)
         (gethash "url" hash)
         (object-url site content :full t)
         (gethash "html" hash)
-        (content-html content)
+        (content-html site content content stage-dir)
         (gethash "excerpt" hash)
-        (content-html-excerpt content)
+        (content-html-excerpt site content content stage-dir)
         (gethash "created-at" hash)
         (content-created-at content)
         
@@ -403,17 +453,17 @@
         )
   
   (if (next-method-p)
-      (call-next-method site content :hash hash)
+      (call-next-method site content stage-dir :hash hash)
       (values hash)))
 
 
-(defmethod template-vars ((site site) (content content-with-tags-mixin) &key (hash (dict)))
+(defmethod template-vars ((site site) (content content-with-tags-mixin) (stage-dir pathname) &key (hash (dict)))
   (setf (gethash "tags" hash)
         (mapcar (curry #'template-vars site)
                 (content-tags content)))
   
   (if (next-method-p)
-      (call-next-method site content :hash hash)
+      (call-next-method site content stage-dir :hash hash)
       (values hash)))
 
 

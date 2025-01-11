@@ -50,7 +50,8 @@
           :reader content-items)))
 
 
-(defmethod staticl/content:get-target-filename ((site site) (feed-file feed-file) (stage-dir pathname))
+(defmethod staticl/content:get-target-filename ((site site) (feed-file feed-file) (stage-dir pathname) &key make-clean-if-needed)
+  (declare (ignore make-clean-if-needed))
   (merge-pathnames (target-path
                     feed-file)
                    stage-dir))
@@ -71,14 +72,19 @@
   (values))
 
 
-(defmethod staticl/content:write-content-to-stream ((site site) (feed-file feed-file) stream)
+(defmethod staticl/content:write-content-to-stream ((site site) (feed-file feed-file) (stream stream) (stage-dir pathname))
   (loop for item in (content-items feed-file)
         for feed-entry = (make-instance 'org.shirakumo.feeder:entry
                                         :id (staticl/url:object-url site item :full t)
                                         :link (staticl/url:object-url site item :full t)
                                         :title (staticl/content:content-title item)
-                                        :summary (staticl/content/html-content:content-html-excerpt item)
-                                        :content (staticl/content::content-html item))
+                                        :summary (staticl/content/html-content:content-html-excerpt
+                                                  site
+                                                  item
+                                                  feed-file
+                                                  stage-dir)
+                                        :content (staticl/content::content-html site item feed-file stage-dir))
+        ;; do (break)
         collect feed-entry into entries
         finally
            (let* ((feed (make-instance 'org.shirakumo.feeder:feed

@@ -30,7 +30,7 @@
   (list (list :path "~S" (theme-path theme))))
 
 
-(defgeneric template-vars (site object &key hash )
+(defgeneric template-vars (site object stage-dir &key hash )
   (:documentation "Fills a hash-table given as HASH argument with variables for filling a template.
 
                    If hash is NIL, then a new hash-table should be allocated with EQUAL :TEST argument.

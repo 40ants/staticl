@@ -44,7 +44,8 @@
           :reader content-items)))
 
 
-(defmethod staticl/content:get-target-filename ((site site) (rss-file rss-file) (stage-dir pathname))
+(defmethod staticl/content:get-target-filename ((site site) (rss-file rss-file) (stage-dir pathname) &key make-clean-if-needed)
+  (declare (ignore make-clean-if-needed))
   (merge-pathnames (target-path rss-file)
                    stage-dir))
 
@@ -72,7 +73,7 @@
                                         :id (staticl/url:object-url item)
                                         :link (staticl/url:object-url item)
                                         :title (staticl/content:content-title item)
-                                        :summary (staticl/content/html-content:content-html-excerpt item)
+                                        :summary (staticl/content/html-content:content-html-excerpt item rss-file)
                                         :content (staticl/content::content-html item))
         collect feed-entry into entries
         finally
