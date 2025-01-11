@@ -151,7 +151,7 @@ The same way page title may be overriden by providing a function as PAGE-TITLE-F
   (values))
 
 
-(defmethod template-vars ((site site) (tag bound-tag) (stage-dir pathname) &key (hash (dict)))
+(defmethod template-vars ((site site) (tag bound-tag) &key (hash (dict)))
   (let ((hash (call-next-method site tag :hash hash)))
     (setf (gethash "url" hash)
           (object-url site (tag-index-page tag)))
@@ -170,7 +170,7 @@ The same way page title may be overriden by providing a function as PAGE-TITLE-F
             (page-target-path page))))
 
 
-(defmethod template-vars ((site site) (page tags-index-page) (stage-dir pathname) &key (hash (dict)))
+(defmethod template-vars ((site site) (page tags-index-page) &key (hash (dict)))
   (let ((hash (call-next-method site page :hash hash)))
     (setf (gethash "tags" hash)
           (mapcar (curry #'template-vars site)

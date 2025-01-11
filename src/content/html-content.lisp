@@ -6,10 +6,10 @@
 (in-package #:staticl/content/html-content)
 
 
-(defgeneric content-html (site content relative-to-content stage-dir)
+(defgeneric content-html (site content relative-to-content)
   (:documentation "Returns a content as HTML string."))
 
-(defgeneric content-html-excerpt (site content relative-to-content stage-dir)
+(defgeneric content-html-excerpt (site content relative-to-content)
   (:documentation "Returns an excerpt of full content as HTML string."))
 
 (defgeneric has-more-content-p (content)

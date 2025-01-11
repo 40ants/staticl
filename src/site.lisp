@@ -162,7 +162,7 @@
 
 (defmethod template-vars ((site site)
                           (obj site)
-                          (stage-dir pathname) &key (hash (dict)))
+                          &key (hash (dict)))
   (dict* hash 
          "title"
          (site-title obj)

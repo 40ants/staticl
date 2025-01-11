@@ -19,7 +19,7 @@
    :name (error ":NAME is required argument for a tag.")))
 
 
-(defmethod template-vars ((site site) (tag tag) (stage-dir pathname) &key (hash (dict)))
+(defmethod template-vars ((site site) (tag tag) &key (hash (dict)))
   (setf (gethash "name" hash)
         (tag-name tag))
   (values hash))

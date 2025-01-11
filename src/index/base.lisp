@@ -100,7 +100,7 @@
 
 
 
-(defmethod template-vars ((site site) (content index-page) (stage-dir pathname) &key (hash (dict)))
+(defmethod template-vars ((site site) (content index-page) &key (hash (dict)))
   (flet ((item-vars (item)
            (dict "url"
                  (staticl/url:object-url site item)
@@ -112,8 +112,7 @@
                  (staticl/content/html-content:content-html-excerpt
                   site
                   item
-                  content
-                  stage-dir)
+                  content)
                  "has-more"
                  (staticl/content/html-content:has-more-content-p item))))
     (declare (dynamic-extent #'item-vars))
@@ -134,7 +133,7 @@
              (staticl/url:object-url site (next-page content))))))
   
   (if (next-method-p)
-      (call-next-method site content stage-dir :hash hash)
+      (call-next-method site content :hash hash)
       (values hash)))
 
 

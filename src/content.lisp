@@ -297,7 +297,7 @@
       (ensure-directories-exist target-filename)
       
       (with-output-to-file (stream target-filename :if-exists :supersede)
-        (write-content-to-stream site content stream stage-dir))
+        (write-content-to-stream site content stream))
       (values))))
 
 
@@ -333,13 +333,13 @@
                           relative-path)))))
 
 
-(defgeneric write-content-to-stream (site content stream stage-dir)
+(defgeneric write-content-to-stream (site content stream)
   (:documentation "Writes CONTENT object to the STREAM using given FORMAT.")
 
-  (:method ((site site) (content content) (stream stream) (stage-dir pathname))
+  (:method ((site site) (content content) (stream stream))
     (let* ((theme (site-theme site))
-           (content-vars (template-vars site content stage-dir))
-           (site-vars (template-vars site site stage-dir))
+           (content-vars (template-vars site content))
+           (site-vars (template-vars site site))
            (vars (dict "site" site-vars
                        "content" content-vars))
            (template-name (content-template content)))
@@ -351,9 +351,9 @@
 ;;   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
-(defmethod template-vars :around ((site site) (content content) (stage-dir pathname) &key (hash (dict)))
+(defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
   (loop with result = (if (next-method-p)
-                          (call-next-method site content stage-dir :hash hash)
+                          (call-next-method site content :hash hash)
                           (values hash))
         for key being the hash-key of (content-metadata content)
           using (hash-value value)
@@ -366,23 +366,30 @@
                    ;; Here we need transform CLOS objects to hash-tables
                    ;; to make their fields accessable in the template
                    (standard-object
-                    (template-vars site value stage-dir))
+                    (template-vars site value))
                    ;; Other types are passed as is:
                    (t
                     value)))
         finally (return result)))
 
 
-(defmethod content-html ((site site) (content content-from-file) (relative-to-content content) (stage-dir pathname))
+(defmethod content-html ((site site) (content content-from-file) (relative-to-content content))
   (let* ((content-filename
-           (get-target-filename site content stage-dir
+           (get-target-filename site
+                                content
+                                ;; We pass fake stage-dir, because when generating HTML
+                                ;; we only need target pathname to calculate relative
+                                ;; paths to media files inside the content.
+                                #P"/"
                                 ;; Here we turn off clean urls,
                                 ;; because we need to get absolute
                                 ;; path to any content assets
                                 ;; on a real filesystem, not in terms of URLs.
                                 :make-clean-if-needed nil))
          (relative-to-content-filename
-           (get-target-filename site relative-to-content stage-dir
+           (get-target-filename site
+                                relative-to-content
+                                #P"/"
                                 :make-clean-if-needed t)))
     (to-html (content-text content)
              (content-format content)
@@ -390,7 +397,7 @@
              relative-to-content-filename)))
 
 
-(defmethod content-html-excerpt ((site site) (content content-from-file) (relative-to-content content) (stage-dir pathname))
+(defmethod content-html-excerpt ((site site) (content content-from-file) (relative-to-content content))
   (let* ((separator (content-excerpt-separator content))
          (full-content (content-text content))
          (excerpt (first
@@ -398,14 +405,21 @@
                               full-content
                               :limit 2)))
          (content-filename
-           (get-target-filename site content stage-dir
+           (get-target-filename site
+                                content
+                                ;; We pass fake stage-dir, because when generating HTML
+                                ;; we only need target pathname to calculate relative
+                                ;; paths to media files inside the content.
+                                #P"/"
                                 ;; Here we turn off clean urls,
                                 ;; because we need to get absolute
                                 ;; path to any content assets
                                 ;; on a real filesystem, not in terms of URLs.
                                 :make-clean-if-needed nil))
          (relative-to-content-filename
-           (get-target-filename site relative-to-content stage-dir
+           (get-target-filename site
+                                relative-to-content
+                                #P"/"
                                 :make-clean-if-needed t)))
     (to-html excerpt
              (content-format content)
@@ -425,15 +439,15 @@
                   (content-file content)))
 
 
-(defmethod template-vars ((site site) (content content-from-file) (stage-dir pathname) &key (hash (dict)))
+(defmethod template-vars ((site site) (content content-from-file) &key (hash (dict)))
   (setf (gethash "title" hash)
         (content-title content)
         (gethash "url" hash)
         (object-url site content :full t)
         (gethash "html" hash)
-        (content-html site content content stage-dir)
+        (content-html site content content)
         (gethash "excerpt" hash)
-        (content-html-excerpt site content content stage-dir)
+        (content-html-excerpt site content content)
         (gethash "created-at" hash)
         (content-created-at content)
         
@@ -453,17 +467,17 @@
         )
   
   (if (next-method-p)
-      (call-next-method site content stage-dir :hash hash)
+      (call-next-method site content :hash hash)
       (values hash)))
 
 
-(defmethod template-vars ((site site) (content content-with-tags-mixin) (stage-dir pathname) &key (hash (dict)))
+(defmethod template-vars ((site site) (content content-with-tags-mixin) &key (hash (dict)))
   (setf (gethash "tags" hash)
         (mapcar (curry #'template-vars site)
                 (content-tags content)))
   
   (if (next-method-p)
-      (call-next-method site content stage-dir :hash hash)
+      (call-next-method site content :hash hash)
       (values hash)))
 
 

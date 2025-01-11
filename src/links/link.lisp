@@ -34,7 +34,7 @@
                  :content content))
 
 
-(defmethod staticl/theme:template-vars ((site site) (link link) (stage-dir pathname) &key (hash (dict)))
+(defmethod staticl/theme:template-vars ((site site) (link link) &key (hash (dict)))
   (dict* hash
          "url"
          (object-url site (link-content link))

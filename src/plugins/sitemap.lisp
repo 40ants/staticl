@@ -17,9 +17,8 @@
                 #:render-sitemap)
   (:import-from #:staticl/url
                 #:object-url)
-  (:export
-   #:sitemap
-   #:should-be-included-into-sitemap-p))
+  (:export #:sitemap
+           #:should-be-included-into-sitemap-p))
 (in-package #:staticl/plugins/sitemap)
 
 
@@ -60,7 +59,7 @@
                    stage-dir))
 
 
-(defmethod write-content-to-stream ((site site) (sitemap sitemap-file) (stream stream) (stage-dir pathname))
+(defmethod write-content-to-stream ((site site) (sitemap sitemap-file) (stream stream))
   (render-sitemap (loop for item in (sitemap-content sitemap)
                         collect (make-url (object-url site item :full t)
                                           :changefreq :weekly

@@ -74,7 +74,7 @@
                                         :link (staticl/url:object-url item)
                                         :title (staticl/content:content-title item)
                                         :summary (staticl/content/html-content:content-html-excerpt item rss-file)
-                                        :content (staticl/content::content-html item))
+                                        :content (staticl/content::content-html item rss-file))
         collect feed-entry into entries
         finally
            (let* ((feed (make-instance 'org.shirakumo.feeder:feed
