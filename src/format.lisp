@@ -2,8 +2,6 @@
   (:use #:cl)
   (:import-from #:alexandria
                 #:make-keyword)
-  (:import-from #:staticl/site
-                #:site)
   (:import-from #:plump)
   (:import-from #:staticl/utils
                 #:make-absolute-url)

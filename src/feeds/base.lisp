@@ -2,6 +2,8 @@
   (:use #:cl)
   (:import-from #:staticl/site
                 #:site)
+  (:import-from #:staticl/pipeline)
+  (:import-from #:plump-dom)
   (:import-from #:org.shirakumo.feeder)
   (:import-from #:staticl/content
                 #:content-file

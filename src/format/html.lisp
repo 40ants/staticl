@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/format/html
-  (:use #:cl))
+  (:use #:cl)
+  (:import-from #:staticl/format))
 (in-package #:staticl/format/html)
 
 

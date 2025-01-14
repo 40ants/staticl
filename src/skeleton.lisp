@@ -2,12 +2,11 @@
   (:use #:cl)
   (:import-from #:serapeum
                 #:->)
+  (:import-from #:alexandria)
   (:import-from #:mystic.template.file
                 #:file-mixin)
   (:import-from #:mystic
                 #:make-option)
-  (:import-from #:mystic.util
-                #:read-template-file)
   (:import-from #:mystic.template.file
                 #:file)
   (:export

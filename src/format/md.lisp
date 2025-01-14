@@ -1,6 +1,8 @@
 (uiop:define-package #:staticl/format/md
   (:use #:cl)
   (:import-from #:staticl/format)
+  (:import-from #:alexandria)
+  (:import-from #:cl-fad)
   (:import-from #:3bmd-code-blocks)
   (:import-from #:3bmd)
   (:import-from #:3bmd-grammar

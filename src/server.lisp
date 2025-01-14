@@ -2,9 +2,10 @@
   (:use #:cl)
   (:import-from #:lack.component)
   (:import-from #:lack.app.file)
+  (:import-from #:staticl/builder)
   (:import-from #:usocket)
   (:import-from #:clack)
-  (:import-from #:docs-builder)
+  (:import-from #:log)
   (:import-from #:fs-watcher)
   (:import-from #:trivial-open-browser
                 #:open-browser)

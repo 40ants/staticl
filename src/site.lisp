@@ -1,6 +1,6 @@
 (uiop:define-package #:staticl/site
   (:use #:cl)
-  (:import-from #:log)
+  (:import-from #:str)
   (:import-from #:local-time)
   (:import-from #:serapeum
                 #:dict*

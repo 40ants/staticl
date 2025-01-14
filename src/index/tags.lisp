@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/index/tags
   (:use #:cl)
+  (:import-from #:staticl/pipeline)
   (:import-from #:staticl/index/base
                 #:page-target-path
                 #:page-size

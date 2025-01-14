@@ -1,7 +1,5 @@
 (uiop:define-package #:staticl/url
   (:use #:cl)
-  (:import-from #:serapeum
-                #:->)
   (:import-from #:quri)
   (:import-from #:alexandria
                 #:with-gensyms
