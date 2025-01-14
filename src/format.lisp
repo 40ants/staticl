@@ -63,7 +63,7 @@
 
 (defgeneric extract-assets (text format content-file)
   (:documentation "Extracts additional content from the text. For example, if markdown content includes an image,
-                   this generic-function should return a list with an object of FILE class. This way an image
+                   this generic-function should return a list with an object of STATICL/CONTENT/FILE:FILE class. This way an image
                    will be copied to the output directory.")
   (:method ((text t) (format t) (content-file t))
     (values nil))
