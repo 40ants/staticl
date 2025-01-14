@@ -18,7 +18,8 @@
   :jobs ((40ants-ci/jobs/linter:linter
           :asdf-systems ("staticl"
                          "staticl-docs"
-                         "staticl-tests"))))
+                         "staticl-tests")
+          :check-imports t)))
 
 (defworkflow docs
   :on-push-to "master"
