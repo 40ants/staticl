@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/plugins/autoreload
   (:use #:cl)
+  (:import-from #:staticl/pipeline)
   (:import-from #:staticl/plugin
                 #:plugin)
   (:import-from #:staticl/site

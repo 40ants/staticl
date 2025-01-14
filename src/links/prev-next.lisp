@@ -1,7 +1,6 @@
 (uiop:define-package #:staticl/links/prev-next
   (:use #:cl)
   (:import-from #:staticl/pipeline)
-  (:import-from #:serapeum)
   (:import-from #:staticl/content
                 #:set-metadata)
   (:import-from #:staticl/site

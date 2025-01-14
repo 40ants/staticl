@@ -8,7 +8,13 @@
 (in-package #:staticl/format/spinneret)
 
 
-(defmethod staticl/format:to-html ((text string) (format (eql :spinneret)))
+(defmethod staticl/format:to-html ((text string)
+                                   (format (eql :spinneret))
+                                   (content-file pathname)
+                                   (relative-to-content-file pathname)
+                                   &key absolute-urls content-url)
+  (declare (ignore absolute-urls content-url))
+  
   (with-gensyms (spinneret-page-package)
     (let* ((*package* (make-package spinneret-page-package
                                     :use '("COMMON-LISP")))

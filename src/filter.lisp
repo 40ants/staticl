@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/filter
   (:use #:cl)
+  (:import-from #:staticl/pipeline)
   (:import-from #:serapeum
                 #:soft-list-of
                 #:->

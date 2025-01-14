@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/themes/closure-template
   (:use #:cl)
+  (:import-from #:serapeum)
   (:import-from #:closure-template
                 #:define-print-syntax
                 #:register-print-handler

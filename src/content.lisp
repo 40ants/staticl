@@ -1,6 +1,7 @@
 (uiop:define-package #:staticl/content
   (:use #:cl)
   (:import-from #:serapeum
+                #:absolute-pathname
                 #:->
                 #:dict)
   (:import-from #:org.shirakumo.fuzzy-dates)
@@ -39,6 +40,7 @@
                 #:tag-name
                 #:tag)
   (:import-from #:staticl/format
+                #:extract-assets
                 #:to-html)
   (:import-from #:staticl/url
                 #:object-url)
@@ -76,7 +78,8 @@
            #:content-tags
            #:content-metadata
            #:content-file-type
-           #:has-tag-p))
+           #:has-tag-p
+           #:content-assets))
 (in-package #:staticl/content)
 
 
@@ -151,7 +154,7 @@
                :type timestamp
                :reader content-created-at)
    (file :initarg :file
-         :type pathname
+         :type absolute-pathname
          :reader content-file
          :documentation "Absolute pathname to the file read from disk or NIL for content objects which have no source file, like RSS feeds.")
    (url :initarg :url
@@ -245,6 +248,13 @@
       (t (constantly nil)))))
 
 
+(defgeneric content-assets (content)
+  (:documentation "This generic-function is called for every content item found on disk and can return a list
+                   of additional content items such as images or files mentioned in the CONTENT argument.")
+  (:method ((content t))
+    (values nil)))
+
+
 (defgeneric read-content-from-disk (site content-type &key exclude)
   (:documentation "Returns a list of CONTENT objects corresponding to a given content type.
 
@@ -261,8 +271,11 @@
                              relative-pathname)
               (let* ((args (read-content-file file))
                      (obj (apply #'make-instance (content-class content-type)
-                                 args)))
-                (collect obj)))))))))
+                                 args))
+                     (assets (content-assets obj)))
+                (collect obj)
+                (loop for item in assets
+                      do (collect item))))))))))
 
 
 (defgeneric read-contents (site &key exclude)
@@ -288,10 +301,12 @@
       (values))))
 
 
-(defgeneric get-target-filename (site content stage-dir)
+(defgeneric get-target-filename (site content stage-dir &key make-clean-if-needed)
   (:documentation "Should return an absolute pathname to a file where this content item should be rendered.")
 
-  (:method ((site site) (content content) (stage-dir pathname))
+  (:method ((site site) (content content) (stage-dir pathname) &key make-clean-if-needed)
+    (declare (ignore make-clean-if-needed))
+    
     (let ((relative-path (enough-namestring (content-file content)
                                             (site-content-root site))))
       (merge-pathnames
@@ -299,9 +314,13 @@
                         relative-path)
        stage-dir)))
   
-  (:method :around ((site site) (content content) (stage-dir pathname))
-    (transform-filename site
-                        (call-next-method))))
+  (:method :around ((site site) (content content) (stage-dir pathname) &key (make-clean-if-needed t))
+    (cond
+      (make-clean-if-needed
+       (transform-filename site
+                           (call-next-method)))
+      (t
+       (call-next-method)))))
 
 
 (defmethod object-url ((site site) (content content-from-file) &key &allow-other-keys)
@@ -354,25 +373,84 @@
         finally (return result)))
 
 
-(defmethod content-html ((content content-from-file))
-  (to-html (content-text content)
-           (content-format content)))
+(defmethod content-html ((site site) (content content-from-file) (relative-to-content content) &key absolute-urls)
+  (let* ((content-filename
+           (get-target-filename site
+                                content
+                                ;; We pass fake stage-dir, because when generating HTML
+                                ;; we only need target pathname to calculate relative
+                                ;; paths to media files inside the content.
+                                #P"/"
+                                ;; Here we turn off clean urls,
+                                ;; because we need to get absolute
+                                ;; path to any content assets
+                                ;; on a real filesystem, not in terms of URLs.
+                                :make-clean-if-needed nil))
+         (relative-to-content-filename
+           (get-target-filename site
+                                relative-to-content
+                                #P"/"
+                                :make-clean-if-needed t)))
+    (to-html (content-text content)
+             (content-format content)
+             content-filename
+             relative-to-content-filename
+             :absolute-urls absolute-urls
+             :content-url (object-url site content
+                                      :full t
+                                      ;; We need to turn off clean urls here,
+                                      ;; otherwise urls to media files will be
+                                      ;; calculated incorrectly:
+                                      :clean-urls nil))))
 
 
-(defmethod content-html-excerpt ((content content-from-file))
+(defmethod content-html-excerpt ((site site) (content content-from-file) (relative-to-content content) &key absolute-urls)
   (let* ((separator (content-excerpt-separator content))
          (full-content (content-text content))
          (excerpt (first
                    (str:split separator
                               full-content
-                              :limit 2))))
+                              :limit 2)))
+         (content-filename
+           (get-target-filename site
+                                content
+                                ;; We pass fake stage-dir, because when generating HTML
+                                ;; we only need target pathname to calculate relative
+                                ;; paths to media files inside the content.
+                                #P"/"
+                                ;; Here we turn off clean urls,
+                                ;; because we need to get absolute
+                                ;; path to any content assets
+                                ;; on a real filesystem, not in terms of URLs.
+                                :make-clean-if-needed nil))
+         (relative-to-content-filename
+           (get-target-filename site
+                                relative-to-content
+                                #P"/"
+                                :make-clean-if-needed t)))
     (to-html excerpt
-             (content-format content))))
+             (content-format content)
+             content-filename
+             relative-to-content-filename
+             :absolute-urls absolute-urls
+             :content-url (object-url site content
+                                      :full t
+                                      ;; We need to turn off clean urls here,
+                                      ;; otherwise urls to media files will be
+                                      ;; calculated incorrectly:
+                                      :clean-urls nil))))
+
 
 (defmethod has-more-content-p ((content content-from-file))
   (let* ((separator (content-excerpt-separator content))
          (full-content (content-text content)))
     (str:containsp separator full-content)))
+
+
+(defmethod content-assets ((content content-from-file))
+  (extract-assets (content-text content)
+                  (content-format content)
+                  (content-file content)))
 
 
 (defmethod template-vars ((site site) (content content-from-file) &key (hash (dict)))
@@ -381,9 +459,9 @@
         (gethash "url" hash)
         (object-url site content :full t)
         (gethash "html" hash)
-        (content-html content)
+        (content-html site content content)
         (gethash "excerpt" hash)
-        (content-html-excerpt content)
+        (content-html-excerpt site content content)
         (gethash "created-at" hash)
         (content-created-at content)
         

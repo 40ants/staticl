@@ -18,7 +18,19 @@
   :jobs ((40ants-ci/jobs/linter:linter
           :asdf-systems ("staticl"
                          "staticl-docs"
-                         "staticl-tests"))))
+                         "staticl-tests")
+          ;; Turned off, because
+          ;; linter complains about:
+          ;; 
+          ;; /home/art/projects/staticl/src/user-package.lisp:
+          ;;   Unused imports: staticl/site, staticl/rsync, staticl/plugins/sitemap...
+          ;; /home/art/projects/staticl/src/utils.lisp:
+          ;;   Missing imports: quicklisp-client (quicklisp-client:quickload)
+          ;;
+          ;; And currently there is no way to ignore these warnings.
+          ;; 
+          ;; :check-imports t
+          )))
 
 (defworkflow docs
   :on-push-to "master"

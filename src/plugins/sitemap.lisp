@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/plugins/sitemap
   (:use #:cl)
+  (:import-from #:staticl/pipeline)
   (:import-from #:staticl/plugin
                 #:plugin)
   (:import-from #:staticl/content
@@ -17,8 +18,8 @@
                 #:render-sitemap)
   (:import-from #:staticl/url
                 #:object-url)
-  (:export
-   #:sitemap))
+  (:export #:sitemap
+           #:should-be-included-into-sitemap-p))
 (in-package #:staticl/plugins/sitemap)
 
 
@@ -43,7 +44,17 @@
 ;;   )
 
 
-(defmethod get-target-filename ((site site) (sitemap sitemap-file) stage-dir)
+(defgeneric should-be-included-into-sitemap-p (content)
+  (:documentation "This generic-function is called to filter out items which should not be visible in the sitemap.
+                   Examples of such content are different assets files.
+
+                   Default method returns T.")
+  (:method ((obj t))
+    (values t)))
+
+
+(defmethod get-target-filename ((site site) (sitemap sitemap-file) stage-dir &key make-clean-if-needed)
+  (declare (ignore make-clean-if-needed))
   (merge-pathnames (make-pathname :name "sitemap"
                                   :type "xml")
                    stage-dir))
@@ -60,4 +71,5 @@
 (defmethod staticl/pipeline:process-items ((site site) (node sitemap) content-items)
   (staticl/pipeline:produce-item
    (make-instance 'sitemap-file
-                  :contents content-items)))
+                  :contents (remove-if-not #'should-be-included-into-sitemap-p
+                             content-items))))

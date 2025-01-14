@@ -1,5 +1,7 @@
 (uiop:define-package #:staticl/plugins/disqus
   (:use #:cl)
+  (:import-from #:staticl/pipeline)
+  (:import-from #:staticl/content/post)
   (:import-from #:staticl/plugin
                 #:plugin)
   (:import-from #:staticl/site
@@ -7,8 +9,6 @@
   (:import-from #:staticl/injections
                 #:add-injection
                 #:content-with-injections-mixin)
-  (:import-from #:staticl/content
-                #:has-tag-p)
   (:import-from #:serapeum
                 #:fmt
                 #:->)

@@ -15,6 +15,9 @@
                "staticl/themes/closure-template"
                "staticl/format/html"
                "staticl/format/md"
+               "staticl/format/spinneret"
+               "staticl/feeds/rss"
+               "staticl/feeds/atom"
                "staticl/user-package"
                "staticl/site-url")
   :in-order-to ((test-op (test-op "staticl-tests"))))
@@ -24,6 +27,7 @@
 (asdf:register-system-packages "bordeaux-threads" '("BORDEAUX-THREADS-2"))
 (asdf:register-system-packages "log4cl" '("LOG"))
 (asdf:register-system-packages "3bmd-ext-code-blocks" '("3BMD-CODE-BLOCKS"))
+(asdf:register-system-packages "3bmd" '("3BMD-GRAMMAR"))
 (asdf:register-system-packages "fuzzy-dates" '("ORG.SHIRAKUMO.FUZZY-DATES"))
 (asdf:register-system-packages "feeder" '("ORG.SHIRAKUMO.FEEDER"))
 

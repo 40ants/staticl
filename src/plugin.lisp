@@ -1,6 +1,5 @@
 (uiop:define-package #:staticl/plugin
   (:use #:cl)
-  (:import-from #:log)
   (:import-from #:serapeum
                 #:fmt
                 #:->)

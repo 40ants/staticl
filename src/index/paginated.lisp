@@ -1,5 +1,7 @@
 (uiop:define-package #:staticl/index/paginated
   (:use #:cl)
+  (:import-from #:local-time)
+  (:import-from #:staticl/content)
   (:import-from #:staticl/pipeline)
   (:import-from #:staticl/site
                 #:site)

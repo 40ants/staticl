@@ -1,5 +1,6 @@
 (uiop:define-package #:staticl/plugins/mathjax
   (:use #:cl)
+  (:import-from #:staticl/pipeline)
   (:import-from #:staticl/plugin
                 #:plugin)
   (:import-from #:staticl/site
