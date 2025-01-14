@@ -127,7 +127,13 @@
     (walk doc)))
 
 
-(defmethod staticl/format:to-html ((text string) (format (eql :md)) (content-file pathname) (relative-to-content-file pathname) &key absolute-urls content-url)
+(defmethod staticl/format:to-html ((text string)
+                                   (format (eql :md))
+                                   (content-file pathname)
+                                   (relative-to-content-file pathname)
+                                   &key absolute-urls content-url)
+  (declare (ignore absolute-urls content-url))
+  
   ;; TODO: move this binding to some outer scope and make
   ;; it possible to turn on different extensions via SITE's settings.
   (let* ((3bmd-code-blocks:*code-blocks* t)
