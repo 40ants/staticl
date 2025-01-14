@@ -9,6 +9,8 @@
                 #:make-absolute-url)
   (:import-from #:serapeum
                 #:->)
+  (:import-from #:lquery
+                #:$)
   (:export #:to-html
            #:extract-assets))
 (in-package #:staticl/format)
@@ -19,7 +21,7 @@
 
 (defun make-urls-absolute (html base-url)
   (let ((doc (plump:parse html)))
-    (lquery:$ doc
+    ($ doc
       "img"
       (map (lambda (item)
              (setf (plump:attribute item "src")
@@ -52,6 +54,7 @@
          html))))
   
   (:method ((text string) (format string) (content-file t) (relative-to-content-file t) &key absolute-urls content-url)
+    (declare (ignore absolute-urls content-url))
     (to-html text
              (make-keyword (string-upcase format))
              content-file
