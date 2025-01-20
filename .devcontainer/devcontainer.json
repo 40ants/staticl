@@ -1,0 +1,8 @@
+{
+    "image": "mcr.microsoft.com/devcontainers/base:alpine",
+    "features": {
+        "ghcr.io/egao1980/features/lem:1": {
+            "version": "latest"
+        }
+    }
+}
