@@ -9,6 +9,8 @@
                               "ASDF"
                               "REPL"
                               "HTTP"))
+  (0.4.1 2025-01-23
+         "* Fixed error when processing a site with filter by path.")
   (0.4.0 2025-01-11
          "* Function STATICL/SITE:SITE now lists all supported keyword arguments.")
   (0.3.1 2024-10-29

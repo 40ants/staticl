@@ -8,6 +8,7 @@
   (:import-from #:staticl/site
                 #:site)
   (:import-from #:staticl/content
+                #:path-matches-p
                 #:has-tag-p
                 #:content)
   (:import-from #:staticl/current-root
@@ -88,13 +89,3 @@
   (let ((filtered (filter-items content-items node)))
     (loop for subnode in (pipeline-items node)
           do (staticl/pipeline:process-items site subnode filtered))))
-
-
-(-> path-matches-p (content pathname)
-    (values boolean &optional))
-
-(defun path-matches-p (content path)
-  (when (typep content 'staticl/content:content-from-file)
-    (when (uiop:subpathp (staticl/content:content-file content)
-                         path)
-      (values t))))
