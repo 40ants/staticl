@@ -6,6 +6,7 @@
   (:import-from #:plump-dom)
   (:import-from #:org.shirakumo.feeder)
   (:import-from #:staticl/content
+                #:path-matches-p
                 #:content-file
                 #:content-created-at
                 #:content)
@@ -108,3 +109,12 @@
          (relative-path (enough-namestring (target-path feed-file)
                                            root)))
     (uiop:unix-namestring relative-path)))
+
+
+
+(defmethod path-matches-p ((content feed-file) (path pathname))
+  (let ((full-target-path (merge-pathnames (target-path content)
+                                           (current-root))))
+    (when (uiop:subpathp full-target-path
+                         path)
+      (values t))))

@@ -4,6 +4,7 @@
                 #:dict
                 #:soft-list-of)
   (:import-from #:staticl/content
+                #:path-matches-p
                 #:has-tag-p
                 #:content-template
                 #:write-content-to-stream
@@ -148,3 +149,11 @@
   "For index pages this method will return T if at least one content item on the page has required tag name."
   (loop for item in (page-items index)
         thereis (has-tag-p item tag-name)))
+
+
+(defmethod path-matches-p ((content index-page) (path pathname))
+  (let ((full-target-path (merge-pathnames (page-target-path content)
+                                           (current-root))))
+    (when (uiop:subpathp full-target-path
+                         path)
+      (values t))))

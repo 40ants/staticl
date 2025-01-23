@@ -3,6 +3,7 @@
   (:import-from #:staticl/plugins/sitemap
                 #:should-be-included-into-sitemap-p)
   (:import-from #:staticl/content
+                #:path-matches-p
                 #:get-target-filename
                 #:write-content)
   (:import-from #:staticl/site
@@ -42,3 +43,9 @@
     (uiop:copy-file (file-path file)
                     target-filename)
     (values)))
+
+
+(defmethod path-matches-p ((content file) (path pathname))
+  (when (uiop:subpathp (file-path content)
+                       path)
+    (values t)))

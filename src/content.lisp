@@ -79,7 +79,8 @@
            #:content-metadata
            #:content-file-type
            #:has-tag-p
-           #:content-assets))
+           #:content-assets
+           #:path-matches-p))
 (in-package #:staticl/content)
 
 
@@ -522,3 +523,12 @@ To override this slot provide :OVERRIDE-SLOT T argument to SET-METADATA function
   (setf (gethash (string-downcase key)
                  (content-metadata content))
         value))
+
+
+(defgeneric path-matches-p (content path)
+  (:documentation "Returns T if CONTENT is inside the given PATH.")
+  
+  (:method ((content content-from-file) (path pathname))
+    (when (uiop:subpathp (content-file content)
+                         path)
+      (values t))))
