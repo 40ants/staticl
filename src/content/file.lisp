@@ -3,6 +3,7 @@
   (:import-from #:staticl/plugins/sitemap
                 #:should-be-included-into-sitemap-p)
   (:import-from #:staticl/content
+                #:content
                 #:path-matches-p
                 #:get-target-filename
                 #:write-content)
@@ -16,7 +17,7 @@
 (in-package #:staticl/content/file)
 
 
-(defclass file ()
+(defclass file (content)
   ((path :initarg :path
          :type absolute-pathname
          :reader file-path))
