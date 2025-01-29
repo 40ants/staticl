@@ -1,7 +1,8 @@
 (uiop:define-package #:staticl/format/md
   (:use #:cl)
   (:import-from #:staticl/format)
-  (:import-from #:alexandria)
+  (:import-from #:alexandria
+                #:proper-list-p)
   (:import-from #:cl-fad)
   (:import-from #:3bmd-code-blocks)
   (:import-from #:3bmd)
@@ -10,17 +11,31 @@
   (:import-from #:staticl/content/file
                 #:file)
   (:import-from #:str
-                #:starts-with-p))
+                #:starts-with-p)
+  (:import-from #:cl-ppcre
+                #:do-register-groups)
+  (:import-from #:anaphora
+                #:it
+                #:awhen))
 (in-package #:staticl/format/md)
 
 
 (defun imagep (node)
   (and (eql (car node)
             :image)
-       (eql (typep (second node)
+       (and (typep (second node)
                    'list)
             (eql (car (second node))
                  :explicit-link))))
+
+
+(defun raw-html-with-video-p (node)
+  (and (eql (car node)
+            :raw-html)
+       (and (typep (second node)
+                   'string)
+            (str:containsp "<video "
+                           (second node)))))
 
 
 (defun image-file (content-file node)
@@ -32,6 +47,19 @@
                 (starts-with-p "http://" markdown-link))
       (merge-pathnames markdown-link
                        content-file))))
+
+
+(defun video-file (content-file node)
+  "Here NODE argument is a list (:raw-html <html string>)"
+  (unless (and (typep node 'list)
+               (eql (car node)
+                    :raw-html))
+    (error "NODE should be a list like (:raw-html <html string>)"))
+  
+  (do-register-groups (url) ("src=\"([^\"]+)\"" (second node))
+    (when url
+      (return (merge-pathnames url
+                               content-file)))))
 
 
 (defun closest-common-subdirectory (path1 path2)
@@ -87,7 +115,32 @@
                      up-dir)))
 
 
-(defun replace-image-urls (doc content-file relative-to-content-file)
+(defun make-sources-relative (html content-file relative-to-content-file)
+  (flet ((transform-url (text start end match-start match-end reg-starts reg-ends)
+           (declare (ignore start end))
+           (let* ((url-start (elt reg-starts 0))
+                  (url-end (elt reg-ends 0))
+                  ;; filename is relative to content-file, now we need to make it absolute
+                  (filename (subseq text url-start url-end))
+                  (absolute-filename (merge-pathnames filename
+                                                      content-file))
+                  ;; Here we need to get path relative to the page for which
+                  ;; content is rendered. For example, if blog post /blog/foo/
+                  ;; uses image ../images/bar.jpg, then when this blog post
+                  ;; is rendered as part of the index page /, then image SRC
+                  ;; should be transformed to blog/images/bar.jpg.
+                  (relative-path
+                    (make-relative-path absolute-filename
+                                        relative-to-content-file)))
+             (concatenate 'string
+                          (subseq text match-start url-start)
+                          (uiop:unix-namestring relative-path)
+                          (subseq text url-end match-end)))))
+    (cl-ppcre:regex-replace-all "src=\"([^\"]+)\"" html
+                                #'transform-url)))
+
+
+(defun replace-media-urls (doc content-file relative-to-content-file)
   (labels ((walk (node)
              (typecase node
                (cons
@@ -118,6 +171,10 @@
                           image))
                        (t
                         node)))
+                    ((raw-html-with-video-p node)
+                     (let ((html (second node)))
+                       (list :raw-html
+                             (make-sources-relative html content-file relative-to-content-file))))
                     ((alexandria:proper-list-p node)
                      (mapcar #'walk node))
                     (t
@@ -140,7 +197,7 @@
   ;; it possible to turn on different extensions via SITE's settings.
   (let* ((3bmd-code-blocks:*code-blocks* t)
          (doc (parse-doc text))
-         (processed-doc (replace-image-urls doc content-file relative-to-content-file)))
+         (processed-doc (replace-media-urls doc content-file relative-to-content-file)))
     (with-output-to-string (str)
       (3bmd:print-doc-to-stream processed-doc str))))
 
@@ -157,11 +214,16 @@
                    (cons
                       (cond
                         ((imagep node)
-                         (when (image-file content-file node)
+                         (awhen (image-file content-file node)
                            (collect
                                (make-instance 'file
-                                              :path (image-file content-file node)))))
-                        ((alexandria:proper-list-p node)
+                                              :path it))))
+                        ((raw-html-with-video-p node)
+                         (collect
+                             (awhen (video-file content-file node)
+                               (make-instance 'file
+                                              :path it))))
+                        ((proper-list-p node)
                          (mapc #'walk node))
                         (t
                          (walk (car node))
