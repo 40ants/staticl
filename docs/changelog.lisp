@@ -11,7 +11,7 @@
                               "HTML"
                               "HTTP"))
   (0.5.0 2025-01-29
-         "* Now markdown pages can include raw HTML blocks like <video src=\"images/foo.mp4\"> and these video files will be propertly copied to the output directory during site generation.")
+         "* Now markdown pages can include raw HTML blocks like `<video src=\"images/foo.mp4\">` and these video files will be propertly copied to the output directory during site generation.")
   (0.4.1 2025-01-23
          "* Fixed error when processing a site with filter by path.")
   (0.4.0 2025-01-11
