@@ -30,4 +30,10 @@
                       (disqus "staticl-example"))
       :theme "readable"
       ;; :theme "hyde"
-      )
+      
+      ;; These variables must be supported by template.
+      ;; Otherwise, they will be ignored:
+      :vars (serapeum:dict "copyright_from" 2024
+                           "copyright_to" (nth-value 5
+                                                     (get-decoded-time))
+                           "hide_staticl_logo" t))

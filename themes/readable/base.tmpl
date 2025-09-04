@@ -66,9 +66,12 @@
               </a>
             {/if}
             {if $site.author}by {$site.author}{/if}
+            {if $site.copyright_from}{$site.copyright_from}{if $site.copyright_to}&nbsp;-&nbsp;{$site.copyright_to}{/if}{/if}
+            {if not $site.hide_staticl_logo}
             <a id="staticl-logo" href="https://github.com/40ants/staticl">
               <img src="/img/staticl-logo-small.webp" style="height: 32px" alt="StatiCL logo" /></p>
             </a>
+            {/if}
           </div>
         </div>
       </div>

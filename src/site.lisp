@@ -3,6 +3,8 @@
   (:import-from #:str)
   (:import-from #:local-time)
   (:import-from #:serapeum
+                #:check-same-test
+                #:do-hash-table
                 #:dict*
                 #:directory-pathname
                 #:dict
@@ -77,7 +79,12 @@
    (pipeline :initarg :pipeline
              :type list
              :reader site-pipeline
-             :documentation "A list of pipline nodes"))
+             :documentation "A list of pipline nodes")
+   (vars :initarg :vars
+         :type (or null hash-table)
+         :initform nil
+         :reader site-vars
+         :documentation "A hash-table with additional variables which can be used in templates. Keys must be strings."))
   (:default-initargs
    :theme "hyde"
    :root (error "ROOT argument is required.")
@@ -88,8 +95,20 @@
    :charset "UTF-8"))
 
 
-(defun site (title &rest args &key description navigation chatset url clean-urls theme pipeline)
-  (declare (ignore description navigation chatset url clean-urls theme pipeline))
+(-> site (string
+          &key
+          (:description string)
+          (:navigation (or null menu))
+          (:charset string)
+          (:url string)
+          (:clean-urls boolean)
+          (:theme string)
+          (:pipeline list)
+          (:vars (or null hash-table)))
+    (values site &optional))
+
+(defun site (title &rest args &key description navigation charset url clean-urls theme pipeline vars)
+  (declare (ignore description navigation charset url clean-urls theme pipeline vars))
   
   (when (getf args :url)
     (assert-absolute-url (getf args :url))
@@ -163,7 +182,7 @@
 (defmethod template-vars ((site site)
                           (obj site)
                           &key (hash (dict)))
-  (dict* hash 
+  (dict* hash
          "title"
          (site-title obj)
          "description" 
@@ -175,5 +194,13 @@
          "charset"
          (site-charset obj)
          "navigation"
-         (site-navigation obj)))
+         (site-navigation obj))
+
+  (when (site-vars obj)
+    (check-same-test (site-vars obj) hash)
+    (do-hash-table (key value (site-vars obj))
+      (setf (gethash key hash)
+            value)))
+  
+  (values hash))
 
