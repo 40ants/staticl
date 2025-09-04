@@ -10,6 +10,8 @@
                               "REPL"
                               "HTML"
                               "HTTP"))
+  (0.6.0 2025-08-29
+         "* Variable STATICL/THEME:*THEMES-PATH* was added. It can be used to point to a directory with custom themes.")
   (0.5.0 2025-01-29
          "* Now markdown pages can include raw HTML blocks like `<video src=\"images/foo.mp4\">` and these video files will be propertly copied to the output directory during site generation.")
   (0.4.1 2025-01-23

@@ -16,8 +16,19 @@
            #:render
            #:list-static
            #:copy-static
-           #:theme-path))
+           #:theme-path
+           #:*themes-path*))
 (in-package #:staticl/theme)
+
+
+(defvar *themes-path* nil
+  "Pathname to the directory where additional themes could be found.
+
+   StatiCL will search theme in the following order:
+
+   1. Inside `themes/` directory of the site.
+   2. Inside a directory pathname pointed to by *THEMES-PATH* variable.
+   3. Inside the `themes/` directory in the StatiCL asdf system.")
 
 
 (defclass theme (print-items-mixin)
@@ -78,7 +89,7 @@
 (defun load-theme (name &key site-root)
   (let ((builtin-themes-dir
           (asdf:system-relative-pathname "staticl"
-                                         "themes"))
+                                         (make-pathname :directory '(:relative "themes"))))
         (site-themes-dir
           (when site-root
             (merge-pathnames
@@ -86,12 +97,15 @@
              (uiop:ensure-directory-pathname site-root)))))
     (or (when site-themes-dir
           (load-theme-from-dir site-themes-dir name))
+        (when *themes-path*
+          (load-theme-from-dir *themes-path* name))
         (load-theme-from-dir builtin-themes-dir
                              name)
         (error "Theme named ~S not found in ~{~A~#[~; and ~:;, ~]~}"
                name
                (remove-if #'null
                           (list site-themes-dir
+                                *themes-path*
                                 builtin-themes-dir))))))
 
 
