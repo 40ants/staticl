@@ -56,7 +56,13 @@
             (*remove-item-func* #'remove-item-func))
         (loop for pipeline-node in (funcall alter-pipeline
                                             (site-pipeline site))
-              do (process-items site pipeline-node known-items)
+              do (process-items site
+                                pipeline-node
+                                ;; Node processing code might
+                                ;; sort or use other destructive operations
+                                ;; on the items, that is why we need
+                                ;; to pass it a copy:
+                                (copy-list known-items))
                  (when items-to-remove
                    ;; This is N*M complexity, but length of items-to-remove
                    ;; usually should be relatively small.
