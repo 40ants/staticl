@@ -97,13 +97,64 @@ Besides custom variables, StatiCL provides several built-in variables accessible
 
 ## Content Variables
 
-Templates also have access to content-specific variables under `$content`:
+Templates have access to content-specific variables under `$content`. The availability of these variables depends on the template type:
+
+### Common Variables (Available in All Templates)
 
 - `$content.title` - Content title
-- `$content.created_at` - Date when content was published
-- `$content.html` - Full content rendered to HTML
+- `$content.tags` - List of tags associated with the content
 - `$content.url` - Content URL
 - `$content.injections` - Code injections for head, before/after content
+
+### Index Template Variables (`index.tmpl`)
+
+Index templates are used for listing pages, tag pages, and paginated content:
+
+- `$content.items` - List of content items to display
+- `$content.prev` - Previous page in pagination
+- `$content.next` - Next page in pagination
+- `$content.months` - List of months for archive navigation
+
+Within the `$content.items` loop, each item has these properties:
+- `$obj.title` - Item title
+- `$obj.url` - Item URL
+- `$obj.created_at` - Publication date
+- `$obj.excerpt` - Item excerpt/summary
+- `$obj.has_more` - Boolean indicating if there's more content
+
+### Post Template Variables (`post.tmpl`)
+
+Post templates are used for individual posts and pages:
+
+- `$content.html` - Full content rendered to HTML
+- `$content.created_at` - Date when content was published
+- `$content.prev` - Previous post/page with navigation
+- `$content.next` - Next post/page with navigation
+
+The `prev` and `next` objects contain:
+- `$content.prev.url` - URL of previous content
+- `$content.prev.title` - Title of previous content
+- `$content.next.url` - URL of next content
+- `$content.next.title` - Title of next content
+
+### Working with Tags
+
+Tags can be iterated over in templates. Here's an example from the themes:
+
+```html
+{if $content.tags}
+  Tagged as {foreach $tag in $content.tags}
+    <a href="{$tag.url}">{$tag.name}</a>{nil}
+    {if not isLast($tag)},{sp}{/if}
+  {/foreach}
+{/if}
+```
+
+Each tag object provides:
+- `$tag.name` - Tag display name
+- `$tag.url` - URL to tag's index page
+
+This template pattern creates a comma-separated list of clickable tag links, such as "Tagged as programming, lisp, web development".
 
 These variables make it easy to create dynamic, customizable templates while keeping your configuration separate from your template code.
 """)
