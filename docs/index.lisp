@@ -25,6 +25,8 @@
                 #:@making-a-site)
   (:import-from #:staticl-docs/pipeline
                 #:@pipeline)
+  (:import-from #:staticl-docs/templates
+                #:@templates)
   (:import-from #:staticl-docs/roadmap
                 #:@roadmap)
   (:import-from #:staticl-docs/contribution

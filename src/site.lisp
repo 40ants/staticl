@@ -39,7 +39,8 @@
            #:clean-urls-p
            #:site-navigation
            #:site-charset
-           #:site-url))
+           #:site-url
+           #:site-vars))
 (in-package #:staticl/site)
 
 
