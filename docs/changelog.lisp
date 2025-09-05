@@ -10,6 +10,8 @@
                               "REPL"
                               "HTML"
                               "HTTP"))
+  (0.7.0 2025-09-04
+         "* Custom site variables can now be defined using the VARS argument in site configuration. These variables are available in templates and allow customization of copyright years, hiding/showing elements, and other site-specific data.")
   (0.6.0 2025-08-29
          "* Variable STATICL/THEME:*THEMES-PATH* was added. It can be used to point to a directory with custom themes.")
   (0.5.0 2025-01-29
