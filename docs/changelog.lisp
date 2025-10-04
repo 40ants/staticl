@@ -10,6 +10,8 @@
                               "REPL"
                               "HTML"
                               "HTTP"))
+  (0.8.0 2025-10-05
+         "* Now STATICL/INDEX/PAGINATED:PAGINATED-INDEX renders an empty index page in case if there is no items.")
   (0.7.1 2025-09-05
          "* Fixed an issue when some pages were not rendered because paginated index used destructive sort operation.")
   (0.7.0 2025-09-04

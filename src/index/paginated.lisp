@@ -112,27 +112,33 @@ The same way page title may be overriden by providing a function as PAGE-TITLE-F
 
 
 (defmethod staticl/pipeline:process-items ((site site) (index paginated-index) content-items)
-  (loop with only-posts = (remove-if-not #'postp content-items)
-        with sorted-posts = (sort only-posts
-                                  #'local-time:timestamp>
-                                  :key #'staticl/content:content-created-at )
-        for batch in (serapeum:batches sorted-posts (page-size index))
-        for page-number upfrom 1
-        collect (make-instance 'index-page
-                               :title (funcall (page-title-fn index)
-                                               page-number)
-                               :target-path (merge-pathnames
-                                             ;; TODO: implement clean urls
-                                             (funcall (page-filename-fn index)
-                                                      page-number)
-                                             (uiop:ensure-directory-pathname
-                                              (index-target-path index)))
-                               :items batch) into pages
-        finally (loop for (prev page next) on (list* nil pages)
-                      when page
-                      do (setf (staticl/index/base:prev-page page)
-                               prev
-                               (staticl/index/base:prev-page page)
-                               next)
-                         (staticl/pipeline:produce-item page)))
+  (flet ((make-page (page-number items)
+           (make-instance 'index-page
+                          :title (funcall (page-title-fn index)
+                                          page-number)
+                          :target-path (merge-pathnames
+                                        ;; TODO: implement clean urls
+                                        (funcall (page-filename-fn index)
+                                                 page-number)
+                                        (uiop:ensure-directory-pathname
+                                         (index-target-path index)))
+                          :items items)))
+    (loop with only-posts = (remove-if-not #'postp content-items)
+          with sorted-posts = (sort only-posts
+                                    #'local-time:timestamp>
+                                    :key #'staticl/content:content-created-at )
+          for batch in (serapeum:batches sorted-posts (page-size index))
+          for page-number upfrom 1
+          collect (make-page page-number batch)
+            into pages
+          finally (or
+                   (loop for (prev page next) on (list* nil pages)
+                         when page
+                           do (setf (staticl/index/base:prev-page page)
+                                    prev
+                                    (staticl/index/base:next-page page)
+                                    next)
+                              (staticl/pipeline:produce-item page))
+                   ;; If there is no any items, then an empty page should be generated
+                   (staticl/pipeline:produce-item (make-page 1 nil)))))
   (values))
