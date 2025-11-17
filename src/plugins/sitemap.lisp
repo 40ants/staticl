@@ -61,11 +61,15 @@
 
 
 (defmethod write-content-to-stream ((site site) (sitemap sitemap-file) (stream stream))
-  (render-sitemap (loop for item in (sitemap-content sitemap)
-                        collect (make-url (object-url site item :full t)
-                                          :changefreq :weekly
-                                          :priority 0.5))
-                  :stream stream))
+  (let ((*read-default-float-format*
+          ;; Until this bug will be fixed:
+          ;; https://github.com/egao1980/cl-sitemaps/issues/3
+          'single-float))
+    (render-sitemap (loop for item in (sitemap-content sitemap)
+                          collect (make-url (object-url site item :full t)
+                                            :changefreq :weekly
+                                            :priority 0.5))
+                    :stream stream)))
 
 
 (defmethod staticl/pipeline:process-items ((site site) (node sitemap) content-items)
