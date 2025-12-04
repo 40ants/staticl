@@ -10,6 +10,8 @@
                               "REPL"
                               "HTML"
                               "HTTP"))
+  (0.9.0 2025-12-04
+         "* Now if content has additional metadata fields, these fields will be available on index items in the template.")
   (0.8.1 2025-11-17
          "* Fixed sitemap.xml format. Previously priority might be rendered as 0.5f0 when `*read-default-float-format*` is bound to `double-float`. See [related issue in cl-sitemaps](https://github.com/egao1980/cl-sitemaps/issues/3).")
   (0.8.0 2025-10-05

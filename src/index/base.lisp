@@ -103,19 +103,22 @@
 
 (defmethod template-vars ((site site) (content index-page) &key (hash (dict)))
   (flet ((item-vars (item)
-           (dict "url"
-                 (staticl/url:object-url site item)
-                 "title"
-                 (staticl/content:content-title item)
-                 "created-at"
-                 (staticl/content:content-created-at item)
-                 "excerpt"
-                 (staticl/content/html-content:content-html-excerpt
-                  site
-                  item
-                  content)
-                 "has-more"
-                 (staticl/content/html-content:has-more-content-p item))))
+           (let ((result (dict "url"
+                               (staticl/url:object-url site item)
+                               "title"
+                               (staticl/content:content-title item)
+                               "created-at"
+                               (staticl/content:content-created-at item)
+                               "excerpt"
+                               (staticl/content/html-content:content-html-excerpt
+                                site
+                                item
+                                content)
+                               "has-more"
+                               (staticl/content/html-content:has-more-content-p item))))
+             (staticl/content::extend-dict-with-metadata site
+                                                         item
+                                                         result))))
     (declare (dynamic-extent #'item-vars))
     
     (setf (gethash "title" hash)

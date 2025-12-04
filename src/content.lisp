@@ -352,13 +352,13 @@
 ;;   (:documentation "Returns an additional list content objects such as RSS feeds or sitemaps."))
 
 
-(defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
-  (loop with result = (if (next-method-p)
-                          (call-next-method site content :hash hash)
-                          (values hash))
-        for key being the hash-key of (content-metadata content)
+(-> extend-dict-with-metadata (site content hash-table)
+    (values hash-table &optional))
+
+(defun extend-dict-with-metadata (site content dict)
+  (loop for key being the hash-key of (content-metadata content)
           using (hash-value value)
-        do (setf (gethash key result)
+        do (setf (gethash key dict)
                  (typecase value
                    ;; For local-time timestamp we want to leave as is
                    ;; because it's formatting may depend on a template.
@@ -371,7 +371,17 @@
                    ;; Other types are passed as is:
                    (t
                     value)))
-        finally (return result)))
+        finally (return dict)))
+
+
+
+
+(defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
+  (extend-dict-with-metadata site
+                             content
+                             (if (next-method-p)
+                                 (call-next-method site content :hash hash)
+                                 hash)))
 
 
 (defmethod content-html ((site site) (content content-from-file) (relative-to-content content) &key absolute-urls)
