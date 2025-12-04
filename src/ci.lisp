@@ -16,6 +16,7 @@
   :on-pull-request t
   :cache t
   :jobs ((40ants-ci/jobs/linter:linter
+          :lisp "sbcl-bin/2.5.10"
           :asdf-systems ("staticl"
                          "staticl-docs"
                          "staticl-tests")
@@ -37,7 +38,9 @@
   :by-cron "0 10 * * 1"
   :on-pull-request t
   :cache t
-  :jobs ((build-docs :asdf-system "staticl-docs")))
+  :jobs ((build-docs
+          :lisp "sbcl-bin/2.5.10"
+          :asdf-system "staticl-docs")))
 
 
 (defworkflow ci
@@ -47,6 +50,6 @@
   :cache t
   :jobs ((run-tests
           :asdf-system "staticl"
-          :lisp ("sbcl-bin"
+          :lisp ("sbcl-bin/2.5.10"
                  "ccl-bin")
           :coverage t)))
