@@ -10,6 +10,9 @@
                               "REPL"
                               "HTML"
                               "HTTP"))
+
+  (0.10.0 2025-12-05
+          "* Now each content page can access it's full url using $content.url in the template.")
   (0.9.0 2025-12-04
          "* Now if content has additional metadata fields, these fields will be available on index items in the template.")
   (0.8.1 2025-11-17

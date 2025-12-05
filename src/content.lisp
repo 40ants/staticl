@@ -377,11 +377,18 @@
 
 
 (defmethod template-vars :around ((site site) (content content) &key (hash (dict)))
-  (extend-dict-with-metadata site
-                             content
-                             (if (next-method-p)
-                                 (call-next-method site content :hash hash)
-                                 hash)))
+  (let ((vars (if (next-method-p)
+                  (call-next-method site content :hash hash)
+                  hash))
+        (full-url (object-url site content :full t)))
+
+    (setf (gethash "url" vars)
+          full-url)
+    
+    (extend-dict-with-metadata site
+                               content
+                               vars)
+    (values vars)))
 
 
 (defmethod content-html ((site site) (content content-from-file) (relative-to-content content) &key absolute-urls)
@@ -467,8 +474,6 @@
 (defmethod template-vars ((site site) (content content-from-file) &key (hash (dict)))
   (setf (gethash "title" hash)
         (content-title content)
-        (gethash "url" hash)
-        (object-url site content :full t)
         (gethash "html" hash)
         (content-html site content content)
         (gethash "excerpt" hash)
