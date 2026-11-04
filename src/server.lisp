@@ -115,6 +115,7 @@
                                          (terpri stream)
                                          ))))
                         (finish-output stream))
+                    #+sbcl
                     ((or
                       sb-int:broken-pipe
                       ;; To handle "Connection reset by peer" error:
